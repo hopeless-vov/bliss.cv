@@ -1,0 +1,322 @@
+@import 'tailwindcss';
+
+/*
+ * Windows XP "Luna" palette, exposed as named Tailwind tokens.
+ * Usage stays first-class Tailwind (bg-luna-blue, text-start-green) — never
+ * arbitrary [#...] values. This @theme block is the single source of colour
+ * truth for the whole XP chrome. See CLAUDE.md rule 7.
+ */
+@theme {
+  /* Fonts (Windows XP system stack) */
+  --font-xp: 'Tahoma', 'Trebuchet MS', 'Segoe UI', sans-serif;
+  --font-xp-display: 'Trebuchet MS', 'Tahoma', sans-serif;
+
+  /* Desktop */
+  --color-desktop: #3a6ea5; /* XP default solid desktop blue */
+  --color-desktop-alt: #235cdc;
+
+  /* Luna blue family */
+  --color-luna-blue: #245edb;
+  --color-luna-blue-light: #3f8cf3;
+  --color-luna-blue-dark: #003399;
+
+  /* Window title bar — active */
+  --color-title-from: #0058e6;
+  --color-title-via: #3f8cf3;
+  --color-title-to: #003399;
+
+  /* Window title bar — inactive */
+  --color-title-inactive-from: #7ba8f0;
+  --color-title-inactive-to: #4a8fe0;
+
+  /* Taskbar */
+  --color-taskbar-from: #3168d5;
+  --color-taskbar-via: #245edb;
+  --color-taskbar-to: #1941a5;
+
+  /* Start button (green) */
+  --color-start-green: #3c8d3c;
+  --color-start-green-light: #79c539;
+  --color-start-green-dark: #2e6b2e;
+
+  /* Window chrome / surfaces */
+  --color-window: #ece9d8; /* classic dialog / control face */
+  --color-window-border: #0831d9;
+  --color-content-border: #aca899;
+  --color-control-blue: #0054e3;
+  --color-title-shadow: #00138c;
+  --color-field: #ffffff;
+
+  /* Accents */
+  --color-highlight: #316ac5; /* selection blue */
+  --color-luna-orange: #ff8c00;
+  --color-icon-select: #0b3fbf; /* desktop icon selection */
+  --color-balloon: #ffffe1; /* classic pale-yellow tooltip */
+
+  /* Sticky notes */
+  --color-note: #fdf7b2;
+  --color-note-border: #c9bd5a;
+  --color-note-text: #3d3410;
+  --color-note-title: #6b5d10;
+
+  /* Start menu */
+  --color-menu-orange: #f5a623;
+  --color-menu-right: #d3e5fa;
+  --color-menu-right-border: #99c8fc;
+  --color-menu-right-text: #1a3d7c;
+
+  /* File-type badges (start menu / icons) */
+  --color-badge-exe: #0054e3;
+  --color-badge-doc: #2b579a;
+  --color-badge-vue: #41b883;
+  --color-badge-js: #e8a000;
+  --color-badge-zip: #b06000;
+
+  /* Text */
+  --color-ink: #1a1a1a;
+}
+
+@layer base {
+  html,
+  body,
+  #app {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-xp);
+    /* The desktop chrome should feel like an OS, not a document. */
+    user-select: none;
+    overflow: hidden;
+  }
+
+  /* Pixel-art icons should stay crisp when scaled. */
+  img[data-pixelated] {
+    image-rendering: pixelated;
+  }
+
+  /* Native <button> defaults to `cursor: default`; every enabled button here
+   * is genuinely clickable, so give the whole app a pointer cursor at once. */
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/*
+ * Named stacking scale — the single source of truth for who paints on top of
+ * whom. Semantic names beat scattered magic z-index numbers; the order here IS
+ * the layering contract (see docs/design-spec.md).
+ */
+@layer utilities {
+  .z-notes {
+    z-index: 60;
+  }
+  .z-window {
+    z-index: 100;
+  }
+  .z-taskbar {
+    z-index: 1000;
+  }
+  .z-start-menu {
+    z-index: 1001;
+  }
+  .z-balloon {
+    z-index: 2000;
+  }
+  .z-context-menu {
+    z-index: 3000;
+  }
+  .z-shutdown {
+    z-index: 5000;
+  }
+  .z-boot {
+    z-index: 7000;
+  }
+}
+
+/*
+ * Multi-stop Luna gradients that can't collapse into a single colour token.
+ * This is the one sanctioned home for them (CLAUDE.md rule 7) — never inline.
+ */
+@layer components {
+  .xp-titlebar-active {
+    background-image: linear-gradient(
+      to bottom,
+      #0058e6 0%,
+      #3a93ff 8%,
+      #288eff 40%,
+      #127dff 88%,
+      #036bfe 100%
+    );
+  }
+
+  .xp-titlebar-inactive {
+    background-image: linear-gradient(to bottom, #7ba8f0 0%, #4a8fe0 100%);
+  }
+
+  .xp-control-btn {
+    background-image: linear-gradient(to bottom, #2a7fff, #0054e3);
+  }
+
+  .xp-control-close {
+    background-image: linear-gradient(
+      to bottom,
+      #e98b7e 0%,
+      #d84534 50%,
+      #c42713 51%,
+      #e03b26 100%
+    );
+  }
+
+  /* Title text uses the Luna dark-blue drop shadow. */
+  .xp-title-shadow {
+    text-shadow: 1px 1px 0 #00138c;
+  }
+
+  .xp-window-shadow {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .xp-taskbar {
+    background-image: linear-gradient(
+      to bottom,
+      #245edb 0%,
+      #3f8cf3 9%,
+      #245edb 18%,
+      #245edb 92%,
+      #1941a5 100%
+    );
+  }
+
+  .xp-start-btn {
+    background-image: linear-gradient(to bottom, #5eac56 0%, #3c8d3c 100%);
+  }
+
+  .xp-taskbar-btn {
+    background-image: linear-gradient(to bottom, #1e52b7, #16408f);
+  }
+
+  .xp-taskbar-btn-active {
+    background-image: linear-gradient(to bottom, #4a90ff, #2a62c8);
+  }
+
+  .xp-tray {
+    background-image: linear-gradient(to bottom, #1290e9 0%, #0e72bd 100%);
+  }
+
+  .xp-boot-block {
+    background-image: linear-gradient(to bottom, #7ba8f0, #2a52c8);
+  }
+
+  .xp-startmenu-header {
+    background-image: linear-gradient(to bottom, #1c60d0 0%, #3f8cf3 50%, #1c60d0 100%);
+  }
+
+  .xp-startmenu-footer {
+    background-image: linear-gradient(to bottom, #4282d6 0%, #3666bd 100%);
+  }
+
+  .xp-avatar {
+    background-image: linear-gradient(135deg, #ffb64f, #e07b00);
+  }
+
+  .xp-power-icon {
+    background-image: linear-gradient(to bottom, #e8694f, #c42713);
+  }
+
+  .xp-note-header {
+    background-image: linear-gradient(to bottom, #f5e97a, #e8d95c);
+  }
+
+  /* Wallpapers — bundled local assets (src/assets/*.webp), not remote URLs. */
+  .xp-wall-bliss {
+    background-image: url('../assets/bliss.webp');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .xp-wall-green-hills {
+    background-image: url('../assets/green-hills.webp');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .xp-wall-sunset {
+    background-image: url('../assets/sunset-field.webp');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .xp-wall-night {
+    background-image: url('../assets/night-sky.webp');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .xp-wall-none {
+    background-image: none;
+  }
+
+  /* Balloon tip pointer (classic black-bordered triangle). */
+  .xp-balloon-arrow::after {
+    content: '';
+    position: absolute;
+    right: 18px;
+    bottom: -8px;
+    border: 8px solid transparent;
+    border-top-color: #000;
+    border-bottom: 0;
+  }
+
+  .xp-boot-blocks {
+    animation: xpload 1.6s linear infinite;
+  }
+
+  /* Desktop icon label + glyph shadows (dark drop for legibility on wallpaper). */
+  .xp-icon-label {
+    text-shadow:
+      1px 1px 2px #000,
+      0 0 4px rgba(0, 0, 0, 0.9);
+  }
+
+  .xp-icon-shadow {
+    filter: drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.45));
+  }
+}
+
+@keyframes xpload {
+  0% {
+    transform: translateX(-48px);
+  }
+  100% {
+    transform: translateX(248px);
+  }
+}
+
+/* Window open/close — a quick scale+fade, like an XP window springing open. */
+.xp-window-enter-active {
+  transition:
+    opacity 130ms ease-out,
+    transform 130ms ease-out;
+}
+.xp-window-leave-active {
+  transition:
+    opacity 100ms ease-in,
+    transform 100ms ease-in;
+}
+.xp-window-enter-from,
+.xp-window-leave-to {
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-boot-blocks {
+    animation: none;
+  }
+  .xp-window-enter-active,
+  .xp-window-leave-active {
+    transition: none;
+  }
+}

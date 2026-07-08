@@ -1,0 +1,245 @@
+{
+  "app": {
+    "title": "Volodymyr Bondarenko — Portfolio"
+  },
+  "boot": {
+    "name": "Volodymyr Bondarenko",
+    "title": "Portfolio",
+    "xp": "XP",
+    "role": "Software Engineer · Amsterdam, NL",
+    "skip": "click to skip"
+  },
+  "welcome": {
+    "title": "Welcome to Volodymyr's portfolio",
+    "body": "Double-click any icon to open it. Drag icons around. Right-click the desktop for settings."
+  },
+  "shutdown": {
+    "safe": "It is now safe to close this tab.",
+    "reboot": "…or click anywhere to boot back up"
+  },
+  "taskbar": {
+    "start": "start"
+  },
+  "startMenu": {
+    "username": "Volodymyr Bondarenko",
+    "initials": "VB",
+    "turnOff": "Turn Off Computer",
+    "items": {
+      "about": "About Me",
+      "skills": "Skills",
+      "education": "Education",
+      "resume": "My Resume (PDF)",
+      "contact": "Contact"
+    }
+  },
+  "menubar": {
+    "file": "File",
+    "edit": "Edit",
+    "view": "View",
+    "help": "Help"
+  },
+  "context": {
+    "newNote": "New Note",
+    "arrangeIcons": "Arrange Icons",
+    "refresh": "Refresh",
+    "cursor": "Cursor",
+    "cursorDefault": "Default",
+    "cursorCrosshair": "Crosshair",
+    "cursorBusy": "Busy (forever)",
+    "cursorHelp": "Help",
+    "wallpaper": "Wallpaper",
+    "wallpaperBliss": "Bliss",
+    "wallpaperGreenHills": "Green Hills",
+    "wallpaperSunset": "Sunset Field",
+    "wallpaperNight": "Night Sky",
+    "wallpaperNone": "Classic Blue",
+    "properties": "Properties"
+  },
+  "note": {
+    "placeholder": "Type your note…"
+  },
+  "profile": {
+    "name": "Volodymyr Bondarenko",
+    "tagline": "Experienced software engineer focused on creating things.",
+    "location": "Amsterdam, NL",
+    "email": "vov.bndrnk{'@'}gmail.com",
+    "phone": "(06) 48 61 36 88",
+    "linkedin": "linkedin.com/in/vov-bndrnk"
+  },
+  "icons": {
+    "vesper": "Vesper.exe",
+    "worth": "Worth_Systems.doc",
+    "frozeneon": "Frozeneon.vue",
+    "quinta": "QuintaGroup.js",
+    "surelock": "SureLock_Key.zip",
+    "about": "About_Me.txt",
+    "skills": "Skills.txt",
+    "education": "Education.doc",
+    "contact": "Contact_Me.eml",
+    "resume": "CV_Volodymyr.pdf",
+    "newNote": "Leave_a_Note.txt",
+    "recycle": "Recycle Bin"
+  },
+  "windows": {
+    "about": {
+      "title": "Volodymyr Bondarenko",
+      "meta": "ABOUT // AMSTERDAM, NL",
+      "intro": "I'm a software engineer based in Amsterdam, currently building large-scale fullstack features at Vesper. I care about clean, scalable code and products that feel good to use.",
+      "interestsHeading": "Interests",
+      "interests": [
+        "Visit the gym",
+        "Listen to records",
+        "Play the guitar",
+        "Meet friends",
+        "Play favorite video games"
+      ],
+      "locationHeading": "Location",
+      "location": "Amsterdam, NL"
+    },
+    "skills": {
+      "title": "Skills",
+      "meta": "SYSTEM SPECS",
+      "intro": "The stack I reach for, grouped by layer.",
+      "languagesHeading": "Programming Languages",
+      "languages": ["JavaScript", "TypeScript", "PHP", "HTML", "CSS", "Sass", "SQL"],
+      "frameworksHeading": "Libraries & Frameworks",
+      "frameworks": [
+        "Laravel",
+        "Vue",
+        "React",
+        "Next.js",
+        "Nuxt.js",
+        "Tailwind",
+        "Pinia",
+        "Playwright",
+        "Vitest",
+        "Highcharts",
+        "Reka UI",
+        "Google Maps API",
+        "axios"
+      ],
+      "toolsHeading": "Tools & Platforms",
+      "tools": [
+        "Git",
+        "GitHub",
+        "CircleCI",
+        "Meilisearch",
+        "Sentry",
+        "Docker",
+        "Vercel",
+        "Figma",
+        "Lighthouse",
+        "Clockwork",
+        "PHPUnit"
+      ]
+    },
+    "education": {
+      "title": "National University of Ivan Franko",
+      "meta": "EDUCATION",
+      "intro": "Bachelor of Computer Science at the National University of Ivan Franko.",
+      "alsoTaughtHeading": "Also taught",
+      "alsoTaught": "Mentor — HTML/CSS/JS at Logos IT Academy (Apr 2022): prepared and delivered course material to 60 students, reviewed homework, and evaluated progress."
+    },
+    "contact": {
+      "title": "Contact",
+      "meta": "GET IN TOUCH",
+      "intro": "Let's build something. Reach me here:",
+      "emailLabel": "Email",
+      "phoneLabel": "Phone",
+      "linkedinLabel": "LinkedIn"
+    },
+    "recycle": {
+      "title": "Recycle Bin",
+      "meta": "ADDITIONAL EXPERIENCE // ARCHIVED, NOT DELETED",
+      "intro": "Older roles — archived, not deleted."
+    }
+  },
+  "experience": {
+    "stackHeading": "Stack",
+    "vesper": {
+      "title": "Vesper",
+      "meta": "SOFTWARE ENGINEER // JAN 2024 — NOW",
+      "role": "Software Engineer",
+      "period": "Jan 2024 — now",
+      "stack": "Vue 3, Tailwind, Reka UI, Pinia, TypeScript, PHP (Laravel), SQL, Meilisearch",
+      "intro": "Building and maintaining large-scale fullstack features across a commodity-trading platform.",
+      "bullets": [
+        "Developed and maintained large-scale fullstack features across the commodity trading platform using Vue 3, Tailwind, Reka UI, Pinia, TypeScript, PHP (Laravel), SQL and Meilisearch; implemented role-based access, REST API endpoints, database migrations, and complex business logic.",
+        "Configured and maintained CI/CD pipelines (GitHub Actions, CircleCI) for build, lint, type-check, send Slack notifications, test, and Sentry release tracking.",
+        "Led end-to-end development of the Bring Your Own Data project, enabling enterprise clients to upload, manage, and visualize custom price series alongside Vesper market data; drove new client acquisition and adoption.",
+        "Built and maintained the Template Workspaces project (Laravel Nova, PHP, SQL), enabling the customer success team to provision pre-configured client environments in minutes—reducing onboarding setup time by 10x.",
+        "Designed and shipped the Smoke Tests automation system: on-demand staging environments seeded with production data, running Playwright E2E tests multiple times daily via CircleCI with Slack notifications on pass/fail.",
+        "Resolved critical performance bottlenecks in high-volume dropdowns (5,680+ series) and the main dashboard: implemented virtual scrolling, lazy loading, and SQL/API query optimizations, cutting request count from 9,940 to 5,223 in targeted flows and reducing dropdown open time to under 200 ms.",
+        "Actively contributed to the shared vesper-ui component library (Vue 3, Tailwind, Reka UI), handling its deployment pipeline and integration across the platform.",
+        "Co-authored a PHP unit-conversion library (open-sourced as vesper/unit-conversion), resolving long-standing silent conversion bugs and adopted platform-wide.",
+        "Collaborated with the AI team on integrating a chatbot into the platform — analyzed integration requirements, evaluated architectural approaches, and contributed to implementation decisions to ensure a seamless fit within the existing product.",
+        "Maintained broad test coverage using Playwright (E2E, component) and PHP (controller & repository tests); maintained technical documentation and contributed to sprint planning, quarterly goal-setting, and tech talks."
+      ]
+    },
+    "worth": {
+      "title": "Worth Internet Systems",
+      "meta": "SOFTWARE ENGINEER // FEB 2023 — 2024",
+      "role": "Software Engineer",
+      "period": "Feb 2023 — 2024",
+      "stack": "React, Next.js, Tailwind CSS, ArcGIS",
+      "intro": "Delivered client projects in cross-functional teams.",
+      "bullets": [
+        "Worked across multiple client projects in cross-functional teams; participated in sprint planning, MVP workshops, and project closing meetings.",
+        "Built UI for a wind turbine simulation tool and a map-based event permit application using React, Next.js, Tailwind CSS, and ArcGIS — implementing custom map markers, layers, and form validations.",
+        "Developed a React-based event pass scanning app for on-site operations and integrated business logic into a company website using EditorX."
+      ]
+    },
+    "frozeneon": {
+      "title": "Frozeneon",
+      "meta": "FRONT-END DEVELOPER // 2022 — 2023",
+      "role": "Front-End Developer",
+      "period": "2022 — 2023",
+      "stack": "Vue 2/3, Nuxt.js, Pinia, SCSS",
+      "intro": "Shipped marketplace features and modernized a legacy front end.",
+      "bullets": [
+        "Developed new marketplace features and enhanced existing functionality using Vue 2/3, Nuxt.js, Pinia, SCSS, and REST API integrations",
+        "Refactored legacy codebase to improve maintainability, performance, and scalability; implemented UI redesigns and optimized front-end architecture for faster load times."
+      ]
+    },
+    "quinta": {
+      "title": "QuintaGroup",
+      "meta": "FRONT-END DEVELOPER // 2021 — JAN 2022",
+      "role": "Front-End Developer",
+      "period": "2021 — Jan 2022",
+      "stack": "Vue.js, TypeScript, GraphQL (Apollo), SCSS",
+      "intro": "Built real-time collaboration UI for a large SaaS platform.",
+      "bullets": [
+        "Developed core features of Sourcery Platform — a large-scale collaborative SaaS for the lighting industry — using Vue.js, TypeScript, GraphQL (Apollo), and SCSS.",
+        "Built complex UI components for real-time collaboration: spreadsheet-like schedule editor, product collections, and manufacturer portal.",
+        "Worked closely with designers on UI/UX improvements, maintaining visual consistency across multiple subsystems."
+      ]
+    },
+    "surelock": {
+      "title": "SureLock & Key",
+      "meta": "FRONT-END DEVELOPER // 2020 — APR 2021",
+      "role": "Front-End Developer",
+      "period": "2020 — Apr 2021",
+      "stack": "Vue.js, TypeScript, Nuxt.js, React, SCSS",
+      "intro": "Built internal tooling and company websites.",
+      "bullets": [
+        "Built an internal CRM system for tracking and assigning tasks to the U.S.-based technicians, integrating Google Maps API and Apollo GraphQL with Vue.js and TypeScript.",
+        "Developed and maintained company websites using Nuxt.js, React, and SCSS; improved performance and SEO for faster load times."
+      ]
+    }
+  },
+  "archived": {
+    "freelance": {
+      "heading": "Freelance Front-End Developer · 2019 — 2020",
+      "bullets": [
+        "Delivered client projects end-to-end based on requirements, using HTML, CSS, JavaScript, Vue, and React.",
+        "Restructured and maintained existing pages, implementing fixes and UI improvements."
+      ]
+    },
+    "logos": {
+      "heading": "Logos IT Academy — Mentor, HTML/CSS/JS · Apr 2022",
+      "bullets": [
+        "Prepared and delivered course material to a group of 60 students; reviewed homework assignments, provided individual support, and evaluated student progress."
+      ]
+    }
+  }
+}

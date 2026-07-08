@@ -1,0 +1,134 @@
+# Windows XP Desktop — Design Spec
+
+The single source of visual truth for **bliss.cv**, reverse-engineered 1:1 from
+`example.html`. The literal, unescaped originals live in
+[`reference/xp-template.html`](reference/xp-template.html) (markup + inline
+styles) and [`reference/xp-logic.txt`](reference/xp-logic.txt) (component logic,
+SVG icon paths). When a pixel value is in doubt, those files win.
+
+Global font stack: `Tahoma, 'Trebuchet MS', sans-serif`. Display/branding uses
+`'Trebuchet MS', Tahoma, sans-serif`. Meta labels use `'Courier New', monospace`.
+
+## Deliberate deviations from the reference
+
+Product decisions, not omissions — the sections below describe what's actually
+implemented, not the literal original bundle:
+
+- **No CRT overlay.** The original's scanline/vignette toggle was cut; it added
+  visual noise without much payoff for a portfolio meant to be read.
+- **Stacking order changed: the open window renders above sticky notes**, not
+  below. The original bundle never needed this rule (notes and the window never
+  competed for the same space in its model); ours does, and an open "page"
+  should never hide under a note. See [Interactions](#interactions) below.
+- **Wallpapers are bundled local photos** (`src/assets/*.webp`), not remote
+  URLs, and **Bliss is its own distinct wallpaper** (the real default Windows
+  XP photo) separate from **Green Hills** — the original spec only had one
+  "Green Hills" placeholder image.
+- **Accessibility beyond the reference:** the window is a focus-trapped
+  `role="dialog"`, Escape closes the topmost overlay, desktop icons open on
+  Enter. The window also gets a subtle scale+fade open/close animation
+  (disabled under `prefers-reduced-motion`).
+
+---
+
+## Colour tokens
+
+All tokens are defined in [`src/styles/main.css`](../src/styles/main.css) under
+`@theme` and consumed as first-class Tailwind classes (`bg-luna-blue`, …). Multi-
+stop gradients are load-bearing for the Luna look — reproduce exactly.
+
+| Area | Token / value |
+|---|---|
+| Desktop fallback | `#3a6ea5` (XP steel blue, under wallpaper) |
+| Root background | `#235cdc` |
+| Boot / shutdown | `#000` |
+| Taskbar gradient | `linear-gradient(to bottom, #245edb 0%, #3f8cf3 9%, #245edb 18%, #245edb 92%, #1941a5 100%)` |
+| Start button | `linear-gradient(to bottom, #5eac56 0%, #3c8d3c 100%)`, radius `0 12px 12px 0` |
+| Windows flag | `#f04e23` / `#79c539` / `#00a4ef` / `#fdbb00`, `skewY(-8deg)` |
+| Title bar (active) | `linear-gradient(to bottom, #0058e6 0%, #3a93ff 8%, #288eff 40%, #127dff 88%, #036bfe 100%)`, text-shadow `#00138c` |
+| Window border | `#0831d9` (1px) |
+| Window face | `#ece9d8` (Luna beige) |
+| Content area | `#fff`, inner border `#aca899` |
+| Menu / hover | `#316ac5` (bg, text → white) |
+| Min/Max button | `linear-gradient(to bottom, #2a7fff, #0054e3)` |
+| Close button | `linear-gradient(to bottom, #e98b7e 0%, #d84534 50%, #c42713 51%, #e03b26 100%)` |
+| Clock tray | `linear-gradient(to bottom, #1290e9 0%, #0e72bd 100%)` |
+| Taskbar app btn | normal `#1e52b7→#16408f`; active `#4a90ff→#2a62c8` |
+| Start menu header | `linear-gradient(to bottom, #1c60d0, #3f8cf3 50%, #1c60d0)`, border `#0054e3`, orange divider `#f5a623` |
+| Start menu right col | bg `#d3e5fa`, border `#99c8fc`, text `#1a3d7c` |
+| Content headings | `#003399`; body text `#3d3d3d`; meta `#6b6b6b`; links `#0044cc`/`#0058e6` |
+| Sticky note | bg `#fdf7b2`, border `#c9bd5a`, header `#f5e97a→#e8d95c`, text `#3d3410` |
+| Balloon tip | bg `#ffffe1`, 1px `#000`, radius 8px |
+| Boot accents | `#ff8c00` (XP), loader blocks `#7ba8f0→#2a52c8`, subtitle `#d8d8d8` |
+
+## Layout
+
+- **Screen** `100vw×100vh`, `overflow:hidden`, dynamic `cursor`.
+- **Desktop** `inset 0 0 32px 0`; `#3a6ea5` + wallpaper `cover/center`.
+- **Taskbar** 32px tall, `z-1000`: Start pill (left) · open-window buttons (center) · clock tray (right).
+- **Start menu** 380px, `z-1001`, opens from `bottom:32px left:0`: header (VB avatar + name) → two columns (left = experience files, right = About/Skills/Education/Resume/Contact) → footer (Turn Off Computer).
+
+## Desktop icons (12)
+
+82px column, 40px glyph (`.svg` component), 11px white label. Positions persist in
+`localStorage['xp-icon-pos']`; grid origin `x=14+col*92, y=14+row*94`.
+
+| id | label | icon | action |
+|---|---|---|---|
+| vesper | Vesper.exe | briefcase | window |
+| worth | Worth_Systems.doc | briefcase | window |
+| frozeneon | Frozeneon.vue | briefcase | window |
+| quinta | QuintaGroup.js | briefcase | window |
+| surelock | SureLock_Key.zip | briefcase | window |
+| about | About_Me.txt | person | window |
+| skills | Skills.txt | notepad | window |
+| education | Education.doc | grad-cap | window |
+| contact | Contact_Me.eml | mail | window |
+| resume | CV_Volodymyr.pdf | pdf | open PDF in new tab |
+| newNote | Leave_a_Note.txt | sticky-note | spawn note |
+| recycle | Recycle Bin | bin | window (archived experience), bottom-right |
+
+## Window model — **single window at a time**
+
+One `openId` at a time; opening another replaces content and cascades `+18px`
+(unless maximized). Chrome: outer `#ece9d8` + `1px #0831d9`, radius `8px 8px 0 0`,
+default `width:min(740px,94vw)`, `height:min(540px,100vh-90px)`, centered. Title
+bar (icon + `C:\Portfolio\<label>` + minimize/maximize/close 21×21) → menubar
+(File/Edit/View/Help) → white content area (`padding:36px 48px`, `user-select:text`):
+Courier meta → `#003399` h1 → intro → sections (h2 + `<p>` + `<ul>`).
+
+Windows map to CV: about, vesper, worth, frozeneon, quinta, surelock, skills,
+education, contact, recycle (archived: Freelance, Logos mentoring).
+
+## Boot / shutdown
+
+- **Boot** (`z-7000`, black): flag logo + "Volodymyr Bondarenko / Portfolio XP" + 220×18 loader (3 blue blocks, `xpload` 1.6s linear infinite). Auto-dismiss after **3.4s** or click to skip.
+- **Welcome balloon** after boot (bottom-right), auto-hides after **9s**.
+- **Shutdown** (`z-5000`, black): orange "It is now safe to close this tab." Click → reboot (re-runs boot).
+
+## Interactions
+
+Drag windows by title bar (clamped, disabled when maximized) · minimize/maximize
+(title dbl-click toggles max) · close · icons: single-click select, click-selected
+or dbl-click opens, draggable with persisted positions · start menu toggles,
+closes on desktop click · desktop right-click context menu (New Note, Arrange
+Icons, Cursor ▶, Wallpaper ▶, Properties) · cursor swap
+(`default/crosshair/wait/help`, applied via native Tailwind `cursor-*`
+utilities) · wallpaper swap · sticky notes: a local scratchpad — spawn, drag,
+edit, delete (persisted to localStorage, no backend) · clock ticks every **15s**.
+
+### Stacking order (z-index)
+
+Lowest to highest: desktop icons (auto) → sticky notes (`z-60`) → the open
+window (`z-100`) → taskbar (`z-1000`) → start menu (`z-1001`) → welcome balloon
+(`z-2000`) → context menu (`z-3000`) → shutdown screen (`z-5000`) → boot screen
+(`z-7000`). The window-above-notes rule is the one deliberate deviation — see
+above.
+
+## Config / persistence
+
+localStorage: `xp-icon-pos`, `xp-wallpaper`, `xp-cursor`, `xp-notes`.
+Assets: wallpapers are bundled local photos in `src/assets/`
+(Bliss is the default), icons are real `.svg` files under `src/assets/icons/`
+imported as components via `vite-svg-loader` (`?component`), cursors are native
+CSS via Tailwind utilities, **no sounds**, resume → `public/CV_Volodymyr.pdf`.

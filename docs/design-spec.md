@@ -127,8 +127,12 @@ above.
 
 ## Config / persistence
 
-localStorage: `xp-icon-pos`, `xp-wallpaper`, `xp-cursor`, `xp-notes`.
+localStorage: `xp-icon-pos`, `xp-wallpaper`, `xp-cursor`, `xp-notes`,
+`xp-assistant`, `xp-assistant-name`.
 Assets: wallpapers are bundled local photos in `src/assets/`
 (Bliss is the default), icons are real `.svg` files under `src/assets/icons/`
 imported as components via `vite-svg-loader` (`?component`), cursors are native
-CSS via Tailwind utilities, **no sounds**, resume → `public/CV_Volodymyr.pdf`.
+CSS via Tailwind utilities, resume → `public/CV_Volodymyr.pdf`. The desktop UI
+itself has **no sounds**; the optional desktop assistant (vendored clippyjs,
+`src/lib/clippy/`) carries its own classic mp3 effects, which play — subject to
+the browser autoplay policy — while its animations run.

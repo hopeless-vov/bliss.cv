@@ -8,28 +8,57 @@ import Taskbar from '@/components/Taskbar.vue'
 import BalloonTip from '@/components/ui/BalloonTip.vue'
 import BootScreen from '@/components/ui/BootScreen.vue'
 import ShutdownScreen from '@/components/ui/ShutdownScreen.vue'
+import { useAssistant } from '@/composables/use-assistant'
 import { useContextMenu } from '@/composables/use-context-menu'
 import { useDesktop } from '@/composables/use-desktop'
 import { useEscapeKey } from '@/composables/use-escape-key'
+import { useNotes } from '@/composables/use-notes'
 import { usePower } from '@/composables/use-power'
 import { useSettings } from '@/composables/use-settings'
 import { useStartMenu } from '@/composables/use-start-menu'
 import { useWindowManager } from '@/composables/use-window-manager'
 import { useWindowRouter } from '@/composables/use-window-router'
-import { onMounted } from 'vue'
+import { DESKTOP_ITEMS } from '@/config/desktop-items'
+import { onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const { isBooting, isShutdown, isBalloonVisible, boot, skipBoot, dismissBalloon } = usePower()
 const { isOpen: isStartMenuOpen, close: closeStartMenu } = useStartMenu()
-const { isVisible: isWindowVisible, close: closeWindow } = useWindowManager()
+const { isVisible: isWindowVisible, openId, close: closeWindow } = useWindowManager()
 const { clearSelection } = useDesktop()
+const { notes } = useNotes()
 const { wallpaperClass, cursorClass } = useSettings()
+const assistant = useAssistant()
 const contextMenu = useContextMenu()
 
 useWindowRouter()
 
-onMounted(boot)
+onMounted(() => {
+  boot()
+  // Loads during the boot screen so the download goes unnoticed; the guard is
+  // inside load() (no-op when disabled).
+  void assistant.load()
+})
+
+// Greet once the boot screen clears (the agent is already loaded by then).
+watch(isBooting, (booting) => {
+  if (!booting && assistant.enabled.value) assistant.greet()
+})
+
+// React to whichever window opens, keyed on its content kind.
+watch(openId, (id) => {
+  const kind = DESKTOP_ITEMS.find((item) => item.id === id)?.kind
+  if (kind) assistant.react({ type: 'open', kind })
+})
+
+// React when a new sticky note appears (from the icon or the context menu).
+watch(
+  () => notes.value.length,
+  (count, previous) => {
+    if (count > previous) assistant.react({ type: 'note' })
+  },
+)
 
 // Escape closes the topmost overlay: context menu → start menu → window.
 useEscapeKey(() => {

@@ -1,5 +1,7 @@
+import { ASSISTANTS } from '@/config/assistants'
 import { DESKTOP_ITEMS } from '@/config/desktop-items'
 import en from '@/locales/en.json'
+import type { WindowKind } from '@/types/desktop'
 import { describe, expect, it } from 'vitest'
 
 function keyExists(path: string): boolean {
@@ -49,6 +51,27 @@ describe('en.json content', () => {
   it('labels every desktop icon', () => {
     for (const label of Object.values(en.icons)) {
       expect(label).toBeTruthy()
+    }
+  })
+
+  it('has a line for every assistant reaction the app resolves at runtime', () => {
+    const openKinds: WindowKind[] = [
+      'about',
+      'experience',
+      'skills',
+      'education',
+      'contact',
+      'recycle',
+    ]
+
+    for (const key of ['greet', 'note', ...openKinds]) {
+      expect(keyExists(`assistant.say.${key}`), `assistant.say.${key}`).toBe(true)
+    }
+  })
+
+  it('has a label for every assistant in the context menu', () => {
+    for (const option of ASSISTANTS) {
+      expect(keyExists(option.labelKey), option.labelKey).toBe(true)
     }
   })
 })

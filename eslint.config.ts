@@ -103,6 +103,13 @@ export default tseslint.config(
   {
     // Ambient declaration files are type-only (and not part of tsconfig's
     // program in the way typescript-eslint's project service expects).
-    ignores: ['dist/', 'node_modules/', 'playwright-report/', '**/*.d.ts'],
+    // `src/lib/clippy/` is vendored third-party code (clippyjs) kept as-is.
+    ignores: [
+      'dist/',
+      'node_modules/',
+      'playwright-report/',
+      '**/*.d.ts',
+      'src/lib/clippy/**',
+    ],
   },
 )

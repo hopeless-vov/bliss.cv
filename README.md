@@ -116,14 +116,23 @@ src/
                    use-pointer-drag (generic drag for windows/notes/icons),
                    use-desktop (icon selection + item activation),
                    use-settings (wallpaper, cursor theme), use-context-menu,
+                   use-assistant (desktop assistant: load/enable/disable/switch + reactions),
                    use-escape-key + use-focus-trap (a11y), use-dynamic-text (runtime i18n keys),
                    use-start-menu, use-start-menu-items, use-window-content, use-clock.
-  stores/        → Thin Pinia state containers (windows, shell, notes, settings, desktop,
-                   icon-positions, context-menu).
+  stores/        → Thin Pinia state containers (windows, shell, notes, settings, assistant,
+                   desktop, icon-positions, context-menu).
   config/        → Structural data (desktop-items — the 12 icons + default grid; ext-badges;
-                   wallpapers; cursors; constants — shared timing/layout values).
+                   wallpapers; cursors; assistants — the 10 agents + default; constants).
   utils/         → Pure helpers (clamp-window, clamp-menu, icon-grid, focusable, format-clock,
-                   format-note-date, file-ext, generate-id), fully tested.
+                   format-note-date, file-ext, generate-id, assistant-reactions), fully tested.
+  lib/           → External boundaries / vendored code, used only via composables (never
+                   imported directly by components/views). Excluded from lint + coverage.
+                   clippy-agent.ts → our typed seam over the vendored runtime (loadAssistant →
+                   AssistantHandle). Dynamically imported so clippy stays out of the initial bundle.
+                   lib/clippy/ → vendored clippyjs (MIT, pi0/clippyjs): the animated desktop
+                   assistant runtime (agent/animator/balloon/queue) + 10 agents, each with a
+                   real map.png sprite + mp3 sounds. Kept as-is (`@ts-nocheck` on the runtime);
+                   Vite code-splits every agent so only the chosen one's sprite loads on demand.
   views/         → Route-level containers. DesktopView is the single route.
   router/        → Route definitions (optional :windowId deep-links a window open).
   locales/       → en.json — all user-visible text and CV content, tree-organized for easy editing.
@@ -141,7 +150,9 @@ src/
 tests/
   unit/          → Vitest unit tests (logic coverage).
   e2e/           → Playwright end-to-end tests: boot, window lifecycle (incl. Escape-to-close),
-                   start menu/shutdown, context menu (cursor/wallpaper), deep links, sticky notes.
+                   start menu/shutdown, context menu (cursor/wallpaper), deep links, sticky notes,
+                   assistant (default-on first visit + turn off). The shared bootDesktop helper
+                   disables the assistant so a floating agent can't shadow click targets.
 
 docs/
   design-spec.md → The 1:1 visual spec (source of truth).
@@ -150,9 +161,15 @@ docs/
 
 ### Desktop settings
 
-Right-click the desktop for the context menu: **New Note**, **Arrange Icons** (resets dragged icons to the default grid), **Cursor** (Default / Crosshair / Busy / Help — applied via native Tailwind `cursor-*` utilities), **Wallpaper** (Bliss / Green Hills / Sunset Field / Night Sky / Classic Blue), and **Properties**. Choices persist in `localStorage` (`xp-wallpaper`, `xp-cursor`, `xp-icon-pos`).
+Right-click the desktop for the context menu: **New Note**, **Arrange Icons** (resets dragged icons to the default grid), **Cursor** (Default / Crosshair / Busy / Help — applied via native Tailwind `cursor-*` utilities), **Wallpaper** (Bliss / Green Hills / Sunset Field / Night Sky / Classic Blue), **Assistant** (None + 10 agents), and **Properties**. Choices persist in `localStorage` (`xp-wallpaper`, `xp-cursor`, `xp-icon-pos`, `xp-assistant`, `xp-assistant-name`).
 
 Desktop icons are draggable; a dragged position overrides the default grid until "Arrange Icons" clears it.
+
+### Desktop assistant
+
+A Clippy-style companion (vendored from clippyjs — see `src/lib/`). It's **on by default** for first-time visitors: the agent loads during the boot screen (so the ~1 MB sprite download goes unnoticed) and greets once the desktop appears. It **reacts** to what you do — opens a window, drops a sticky note — by playing an animation and saying a line. Right-click → **Assistant** to switch between the 10 agents or turn it off; the choice persists (`xp-assistant`, `xp-assistant-name`). Only the selected agent's sprite is fetched (Vite code-splits each one). All logic lives in `use-assistant` (reactions in `assistant-reactions`); DOM/vendored contact is isolated in the `lib/clippy-agent` boundary.
+
+> **Note:** agents ship uncompressed sprites (`src/lib/clippy/agents/*/map.png`, ~0.7–1.9 MB each) and mp3 sounds — kept as-is from upstream, worth compressing before a production deploy.
 
 Wallpapers are bundled local photos in `src/assets/` (`bliss.webp`, `green-hills.webp`, `sunset-field.webp`, `night-sky.webp`) — no remote URLs. **Bliss** (the real default Windows XP wallpaper) is the app's default.
 

@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import ChevronRightIcon from '@/assets/icons/chevron-right.svg?component'
+import { useAssistant } from '@/composables/use-assistant'
 import { useDesktop } from '@/composables/use-desktop'
 import { useDynamicText } from '@/composables/use-dynamic-text'
 import { useIconPositions } from '@/composables/use-icon-positions'
 import { useNotes } from '@/composables/use-notes'
 import { useSettings } from '@/composables/use-settings'
+import type { AssistantName } from '@/config/assistants'
+import { ASSISTANTS } from '@/config/assistants'
 import type { CursorId } from '@/config/cursors'
 import { CURSORS } from '@/config/cursors'
 import type { WallpaperId } from '@/config/wallpapers'
@@ -20,6 +23,12 @@ const { createNote } = useNotes()
 const { activateById } = useDesktop()
 const { arrangeIcons } = useIconPositions()
 const { wallpaper, cursor, setWallpaper, setCursor } = useSettings()
+const {
+  enabled: assistantEnabled,
+  name: assistantName,
+  disable: disableAssistant,
+  setAgent: setAssistant,
+} = useAssistant()
 
 function onNewNote(): void {
   createNote()
@@ -43,6 +52,16 @@ function onWallpaper(id: WallpaperId): void {
 
 function onProperties(): void {
   activateById('about')
+  emit('close')
+}
+
+function onAssistantOff(): void {
+  disableAssistant()
+  emit('close')
+}
+
+function onAssistantPick(name: AssistantName): void {
+  void setAssistant(name)
   emit('close')
 }
 </script>
@@ -120,6 +139,48 @@ function onProperties(): void {
           <span class="grid w-2 place-items-center">
             <span
               v-if="wallpaper === option.id"
+              class="h-1.25 w-1.25 rounded-full bg-current"
+            />
+          </span>
+          {{ td(option.labelKey) }}
+        </button>
+      </div>
+    </div>
+
+    <div class="group relative">
+      <button
+        type="button"
+        class="flex w-full items-center justify-between px-4 py-1.25 text-left group-hover:bg-highlight group-hover:text-white"
+      >
+        {{ t('context.assistant') }}
+        <ChevronRightIcon class="h-2 w-1.25" />
+      </button>
+      <div
+        class="xp-window-shadow absolute top-0 left-full hidden max-h-64 w-37.5 overflow-y-auto rounded-xs border border-content-border bg-field py-1 group-hover:block"
+      >
+        <button
+          type="button"
+          class="flex w-full items-center gap-2 px-3 py-1.25 text-left hover:bg-highlight hover:text-white"
+          @click="onAssistantOff"
+        >
+          <span class="grid w-2 place-items-center">
+            <span
+              v-if="!assistantEnabled"
+              class="h-1.25 w-1.25 rounded-full bg-current"
+            />
+          </span>
+          {{ t('context.assistantOff') }}
+        </button>
+        <button
+          v-for="option in ASSISTANTS"
+          :key="option.name"
+          type="button"
+          class="flex w-full items-center gap-2 px-3 py-1.25 text-left hover:bg-highlight hover:text-white"
+          @click="onAssistantPick(option.name)"
+        >
+          <span class="grid w-2 place-items-center">
+            <span
+              v-if="assistantEnabled && assistantName === option.name"
               class="h-1.25 w-1.25 rounded-full bg-current"
             />
           </span>

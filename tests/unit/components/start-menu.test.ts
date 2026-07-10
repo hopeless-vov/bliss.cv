@@ -19,6 +19,6 @@ describe('StartMenu', () => {
     const aboutButton = wrapper.findAll('button').find((b) => b.text() === 'About Me')
     await aboutButton?.trigger('click')
 
-    expect(windows.openId).toBe('about')
+    expect(windows.windows.map((win) => win.id)).toContain('about')
   })
 })

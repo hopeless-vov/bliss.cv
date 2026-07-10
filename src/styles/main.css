@@ -112,8 +112,10 @@
   .z-notes {
     z-index: 60;
   }
+  /* Windows share this band; `--stack` (a per-window 1..n rank, set inline)
+   * orders them within it while keeping the base in one place. */
   .z-window {
-    z-index: 100;
+    z-index: calc(100 + var(--stack, 0));
   }
   .z-taskbar {
     z-index: 1000;

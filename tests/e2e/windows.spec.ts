@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { bootDesktop, openIcon, windowLocator } from './helpers'
+import { bootDesktop, openIcon, taskbarButton, windowByTitle, windowLocator } from './helpers'
 
 test.describe('window lifecycle', () => {
   test('opens from a desktop icon, deep-links the URL, and closes', async ({ page }) => {
@@ -25,9 +25,7 @@ test.describe('window lifecycle', () => {
     await win.getByRole('button', { name: 'Minimize' }).click()
     await expect(win).toBeHidden()
 
-    // Scoped by testid, not label — once open, the taskbar button and the
-    // desktop icon share the same accessible name ("Skills.txt").
-    await page.getByTestId('taskbar-window-button').click()
+    await taskbarButton(page, 'Skills.txt').click()
     await expect(win).toBeVisible()
   })
 
@@ -48,7 +46,7 @@ test.describe('window lifecycle', () => {
     await expect.poll(width).toBeLessThan(viewport.width)
   })
 
-  test('closes the window with the Escape key', async ({ page }) => {
+  test('closes the focused window with the Escape key', async ({ page }) => {
     await bootDesktop(page)
     await openIcon(page, 'About_Me.txt')
 
@@ -59,15 +57,44 @@ test.describe('window lifecycle', () => {
     await expect(win).toBeHidden()
   })
 
-  test('switching icons cascades the window instead of stacking a new one', async ({ page }) => {
+  test('opens several windows side by side instead of replacing content', async ({ page }) => {
     await bootDesktop(page)
 
     await openIcon(page, 'About_Me.txt')
-    const win = windowLocator(page)
-    await expect(win.getByRole('heading', { level: 1 })).toHaveText('Volodymyr Bondarenko')
-
     await openIcon(page, 'Skills.txt')
-    await expect(win.getByRole('heading', { level: 1 })).toHaveText('Skills')
+
+    // Both stay open at once; the second did not replace the first.
+    await expect(windowByTitle(page, 'Volodymyr Bondarenko')).toBeVisible()
+    await expect(windowByTitle(page, 'Skills')).toBeVisible()
+    await expect(page.getByRole('dialog')).toHaveCount(2)
+    await expect(page.getByTestId('taskbar-window-button')).toHaveCount(2)
+  })
+
+  test('brings a window to the front from its taskbar button (URL follows focus)', async ({
+    page,
+  }) => {
+    await bootDesktop(page)
+
+    await openIcon(page, 'About_Me.txt')
+    await openIcon(page, 'Skills.txt')
     await expect(page).toHaveURL(/\/skills$/)
+
+    // Clicking a non-focused window's taskbar button raises it to the top.
+    await taskbarButton(page, 'About_Me.txt').click()
+    await expect(page).toHaveURL(/\/about$/)
+  })
+
+  test('minimizing one window leaves the others open', async ({ page }) => {
+    await bootDesktop(page)
+
+    await openIcon(page, 'About_Me.txt')
+    await openIcon(page, 'Skills.txt')
+
+    await windowByTitle(page, 'Skills').getByRole('button', { name: 'Minimize' }).click()
+
+    await expect(windowByTitle(page, 'Skills')).toBeHidden()
+    await expect(windowByTitle(page, 'Volodymyr Bondarenko')).toBeVisible()
+    // Both are still listed on the taskbar.
+    await expect(page.getByTestId('taskbar-window-button')).toHaveCount(2)
   })
 })

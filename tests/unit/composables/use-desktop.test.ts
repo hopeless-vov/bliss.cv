@@ -25,7 +25,7 @@ describe('useDesktop', () => {
 
     desktop.activate({ id: 'skills', icon: 'notepad', action: 'window', kind: 'skills' })
 
-    expect(windows.openId).toBe('skills')
+    expect(windows.windows.map((win) => win.id)).toContain('skills')
     expect(desktop.selectedId.value).toBe('skills')
   })
 
@@ -72,9 +72,9 @@ describe('useDesktop', () => {
     const windows = useWindowsStore()
 
     desktop.activateById('about')
-    expect(windows.openId).toBe('about')
+    expect(windows.windows.map((win) => win.id)).toEqual(['about'])
 
     desktop.activateById('nope')
-    expect(windows.openId).toBe('about')
+    expect(windows.windows.map((win) => win.id)).toEqual(['about'])
   })
 })

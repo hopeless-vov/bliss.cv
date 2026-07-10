@@ -108,8 +108,8 @@ src/
     (root)       → Smart components (Desktop, DesktopWindow, DesktopIcons, Taskbar, StartMenu,
                    ContextMenu, StickyNotes, WindowContent) that wire ui/ to composables.
   composables/   → All logic, each with a unit test:
-                   use-window-manager (open/close/min/max/mobile),
-                   use-window-router (URL ↔ window deep-link sync),
+                   use-window-manager (multi-window: open/focus/close/min/max/stacking + mobile),
+                   use-window-router (URL ↔ focused-window deep-link sync),
                    use-power (boot → balloon → shutdown lifecycle),
                    use-notes (local sticky notes: spawn/drag/edit/delete),
                    use-icon-positions (drag + persisted grid, Arrange Icons),
@@ -117,13 +117,13 @@ src/
                    use-desktop (icon selection + item activation),
                    use-settings (wallpaper, cursor theme), use-context-menu,
                    use-assistant (desktop assistant: load/enable/disable/switch + reactions),
-                   use-escape-key + use-focus-trap (a11y), use-dynamic-text (runtime i18n keys),
+                   use-escape-key (a11y), use-dynamic-text (runtime i18n keys),
                    use-start-menu, use-start-menu-items, use-window-content, use-clock.
   stores/        → Thin Pinia state containers (windows, shell, notes, settings, assistant,
                    desktop, icon-positions, context-menu).
   config/        → Structural data (desktop-items — the 12 icons + default grid; ext-badges;
                    wallpapers; cursors; assistants — the 10 agents + default; constants).
-  utils/         → Pure helpers (clamp-window, clamp-menu, icon-grid, focusable, format-clock,
+  utils/         → Pure helpers (clamp-window, clamp-menu, icon-grid, format-clock,
                    format-note-date, file-ext, generate-id, assistant-reactions), fully tested.
   lib/           → External boundaries / vendored code, used only via composables (never
                    imported directly by components/views). Excluded from lint + coverage.
@@ -150,7 +150,8 @@ src/
 tests/
   unit/          → Vitest unit tests (logic coverage).
   e2e/           → Playwright end-to-end tests: boot, window lifecycle (incl. Escape-to-close),
-                   start menu/shutdown, context menu (cursor/wallpaper), deep links, sticky notes,
+                   start menu/shutdown, context menu (cursor/wallpaper), deep links, multiple
+                   windows (open side by side, raise from taskbar, minimize one of many), sticky notes,
                    assistant (default-on first visit + turn off). The shared bootDesktop helper
                    disables the assistant so a floating agent can't shadow click targets.
 
@@ -177,7 +178,7 @@ Wallpapers are bundled local photos in `src/assets/` (`bliss.webp`, `green-hills
 
 ### Deep links
 
-Every window has a shareable URL: `/vesper`, `/about`, `/skills`, … `useWindowRouter` keeps the URL and the window manager in sync both ways (back/forward work); unknown ids redirect to `/`.
+Every window has a shareable URL: `/vesper`, `/about`, `/skills`, … The URL mirrors the **focused** window; opening one from a deep link opens and focuses it without disturbing other open windows, and closing/raising a window rewrites the URL to whatever is on top now (`useWindowRouter`). Only the focused window is restored on reload — the URL tracks focus, not the whole session. Unknown ids redirect to `/`.
 
 ### Sticky notes
 
@@ -197,13 +198,13 @@ CV content is data, edited without touching components. In `src/locales/en.json`
 A faithful Windows XP "Luna" theme. All colours are named tokens in `src/styles/main.css` (`@theme`) — e.g. `luna-blue`, `start-green`, `title-from/via/to`, `window`, `highlight`. Never use arbitrary colour values; extend the palette instead (see `CLAUDE.md` rule 7).
 
 - **Fonts:** `Tahoma, 'Trebuchet MS', sans-serif` (UI); `'Trebuchet MS', Tahoma` (display).
-- **Window model:** one window open at a time, matching the reference.
-- **Stacking order:** a named z-index scale in `main.css` (`z-notes` → `z-window` → `z-taskbar` → `z-start-menu` → `z-balloon` → `z-context-menu` → `z-shutdown` → `z-boot`) — semantic classes instead of magic numbers. The window sits above notes deliberately (an open "page" should never hide under a note), the one place this diverges from the reference bundle.
+- **Window model:** multiple windows open at once — each with its own position, minimize/maximize state and stacking order. Clicking a window (or its taskbar button) raises it; the top-most non-minimized window is "focused" and its id is mirrored in the URL. This is a deliberate deviation from the reference, which showed one window at a time.
+- **Stacking order:** a named z-index scale in `main.css` (`z-notes` → `z-window` → `z-taskbar` → `z-start-menu` → `z-balloon` → `z-context-menu` → `z-shutdown` → `z-boot`) — semantic classes instead of magic numbers. Windows share the `z-window` band and are ordered *within* it by a per-window `--stack` rank (`z-index: calc(100 + var(--stack))`) — a compact 1..n counter bounded by the number of open windows, so it always stays above notes and below the taskbar. Windows sit above notes deliberately (an open "page" should never hide under a note).
 
 ### Accessibility
 
-- The open window is a `role="dialog"` / `aria-modal` labelled by its title; focus moves into it on open and is trapped there (`use-focus-trap`).
-- **Escape** closes the topmost overlay — context menu → start menu → window (`use-escape-key`).
+- Each open window is a non-modal `role="dialog"` labelled by its title; focus moves into a window when it opens or is restored. Windows coexist, so focus is intentionally *not* trapped.
+- **Escape** closes the topmost overlay — context menu → start menu → focused window (`use-escape-key`).
 - Desktop icons are real buttons; **Enter** opens the selected one.
 - Every enabled button shows a pointer cursor.
 

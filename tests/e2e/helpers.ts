@@ -18,9 +18,19 @@ export async function bootDesktop(page: Page, path = '/', assistant = false): Pr
   await page.getByTestId('balloon-close').click()
 }
 
-/* The single open window, scoped so "Close"/"Minimize"/"Maximize" queries never clash with other overlays. */
+/* An open window, scoped so "Close"/"Minimize"/"Maximize" queries never clash with other overlays. */
 export function windowLocator(page: Page) {
   return page.getByTestId('xp-window')
+}
+
+/* A specific window by its title (the dialog's accessible name), for when several are open. */
+export function windowByTitle(page: Page, title: string) {
+  return page.getByRole('dialog', { name: title, exact: true })
+}
+
+/* The taskbar button for a given window label (distinct from the same-named desktop icon). */
+export function taskbarButton(page: Page, label: string) {
+  return page.getByTestId('taskbar-window-button').filter({ hasText: label })
 }
 
 export async function openIcon(page: Page, label: string): Promise<void> {

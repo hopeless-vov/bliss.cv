@@ -24,10 +24,15 @@ implemented, not the literal original bundle:
   URLs, and **Bliss is its own distinct wallpaper** (the real default Windows
   XP photo) separate from **Green Hills** — the original spec only had one
   "Green Hills" placeholder image.
-- **Accessibility beyond the reference:** the window is a focus-trapped
-  `role="dialog"`, Escape closes the topmost overlay, desktop icons open on
-  Enter. The window also gets a subtle scale+fade open/close animation
-  (disabled under `prefers-reduced-motion`).
+- **Multiple windows open at once.** The reference showed one window at a time;
+  ours lets windows coexist — each with its own position, minimize/maximize
+  state and stacking order, raised on click like real Windows. See
+  [Window model](#window-model--multiple-windows) below.
+- **Accessibility beyond the reference:** each window is a non-modal
+  `role="dialog"` labelled by its title; focus moves into a window when it opens
+  or is restored (windows coexist, so focus is *not* trapped), Escape closes the
+  focused window, and desktop icons open on Enter. Windows also get a subtle
+  scale+fade open/close animation (disabled under `prefers-reduced-motion`).
 
 ---
 
@@ -88,10 +93,17 @@ stop gradients are load-bearing for the Luna look — reproduce exactly.
 | newNote | Leave_a_Note.txt | sticky-note | spawn note |
 | recycle | Recycle Bin | bin | window (archived experience), bottom-right |
 
-## Window model — **single window at a time**
+## Window model — **multiple windows**
 
-One `openId` at a time; opening another replaces content and cascades `+18px`
-(unless maximized). Chrome: outer `#ece9d8` + `1px #0831d9`, radius `8px 8px 0 0`,
+Windows open side by side — each an entry in the windows store with its own
+position, minimize/maximize state and stacking order (`z`). Opening a file
+that's already open focuses its existing window instead of duplicating it; the
+first window centres and each further one cascades `+18px` off the focused one
+(unless maximized). Clicking a window — or its taskbar button — raises it to the
+top; the top-most non-minimized window is "focused" (active title bar) and its
+id is mirrored in the URL. Minimizing drops a window from the DOM (the taskbar
+still lists it); restoring brings it back and forward. Chrome: outer `#ece9d8` +
+`1px #0831d9`, radius `8px 8px 0 0`,
 default `width:min(740px,94vw)`, `height:min(540px,100vh-90px)`, centered. Title
 bar (icon + `C:\Portfolio\<label>` + minimize/maximize/close 21×21) → menubar
 (File/Edit/View/Help) → white content area (`padding:36px 48px`, `user-select:text`):
@@ -108,8 +120,9 @@ education, contact, recycle (archived: Freelance, Logos mentoring).
 
 ## Interactions
 
-Drag windows by title bar (clamped, disabled when maximized) · minimize/maximize
-(title dbl-click toggles max) · close · icons: single-click select, click-selected
+Open several windows at once · click a window or its taskbar button to raise it
+· drag windows by title bar (clamped, disabled when maximized) ·
+minimize/maximize (title dbl-click toggles max) · close · icons: single-click select, click-selected
 or dbl-click opens, draggable with persisted positions · start menu toggles,
 closes on desktop click · desktop right-click context menu (New Note, Arrange
 Icons, Cursor ▶, Wallpaper ▶, Properties) · cursor swap
@@ -119,11 +132,16 @@ edit, delete (persisted to localStorage, no backend) · clock ticks every **15s*
 
 ### Stacking order (z-index)
 
-Lowest to highest: desktop icons (auto) → sticky notes (`z-60`) → the open
-window (`z-100`) → taskbar (`z-1000`) → start menu (`z-1001`) → welcome balloon
-(`z-2000`) → context menu (`z-3000`) → shutdown screen (`z-5000`) → boot screen
-(`z-7000`). The window-above-notes rule is the one deliberate deviation — see
-above.
+Lowest to highest: desktop icons (auto) → sticky notes (`z-60`) → windows
+(the `z-window` band: `z-index: calc(100 + var(--stack))`) → taskbar (`z-1000`)
+→ start menu (`z-1001`) → welcome balloon (`z-2000`) → context menu (`z-3000`) →
+shutdown screen (`z-5000`) → boot screen (`z-7000`). The base lives in the
+`.z-window` token; each window sets only its `--stack` inline — a compact 1..n
+rank (re-normalised on add/focus/close), so it can never climb into the taskbar
+band. Windows keep a stable DOM order (insertion order) and stack purely by
+`--stack`, so raising one never reorders the DOM (which would drop text
+selections mid-click). The window-above-notes rule is a deliberate deviation —
+see above.
 
 ## Config / persistence
 

@@ -8,14 +8,16 @@ const WINDOW_IDS = new Set(
 )
 
 /*
- * Two-way sync between the open window and the URL. /vesper opens the Vesper
- * window (deep link, back/forward work); opening or closing a window from the
- * UI rewrites the URL. Unknown ids redirect to /.
+ * Sync between the URL and the *focused* window. A deep link (/vesper) opens
+ * and focuses that window; focusing or closing a window rewrites the URL to
+ * whatever is on top now (or / when the desktop is empty). Other open windows
+ * are left untouched — the URL tracks the focused window, not the whole
+ * session, so links stay shareable. Unknown ids redirect to /.
  */
 export function useWindowRouter(): void {
   const route = useRoute()
   const router = useRouter()
-  const { openId, isOpen, open, close } = useWindowManager()
+  const { focusedId, open } = useWindowManager()
 
   watch(
     () => route.params.windowId,
@@ -23,15 +25,13 @@ export function useWindowRouter(): void {
       const id = typeof param === 'string' ? param : ''
 
       if (id && WINDOW_IDS.has(id)) {
-        if (openId.value !== id) {
+        if (focusedId.value !== id) {
           open(id)
         }
         return
       }
 
-      if (isOpen.value) {
-        close()
-      }
+      // An unknown id (e.g. /resume, /typo) can't map to a window — bounce to /.
       if (id) {
         router.replace('/')
       }
@@ -39,7 +39,7 @@ export function useWindowRouter(): void {
     { immediate: true },
   )
 
-  watch(openId, (id) => {
+  watch(focusedId, (id) => {
     const target = id ? `/${id}` : '/'
     if (route.path !== target) {
       router.replace(target)

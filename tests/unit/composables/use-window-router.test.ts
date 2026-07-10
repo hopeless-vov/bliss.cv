@@ -35,25 +35,25 @@ describe('useWindowRouter', () => {
     setActivePinia(createPinia())
   })
 
-  it('opens the window from a deep link', async () => {
+  it('opens the focused window from a deep link', async () => {
     await mountAt('/vesper')
     const wm = useWindowManager()
 
-    expect(wm.openId.value).toBe('vesper')
+    expect(wm.focusedId.value).toBe('vesper')
   })
 
-  it('leaves an already-open window untouched', async () => {
+  it('leaves an already-focused window untouched', async () => {
     const wm = useWindowManager()
     wm.open('about')
-    const position = { ...wm.position.value }
+    const position = { ...wm.windows.value[0].position }
 
     await mountAt('/about')
 
-    expect(wm.openId.value).toBe('about')
-    expect(wm.position.value).toEqual(position)
+    expect(wm.windows.value).toHaveLength(1)
+    expect(wm.windows.value[0].position).toEqual(position)
   })
 
-  it('rewrites the URL when a window opens and closes', async () => {
+  it('rewrites the URL as the focused window opens and closes', async () => {
     const router = await mountAt('/')
     const wm = useWindowManager()
 
@@ -61,27 +61,43 @@ describe('useWindowRouter', () => {
     await flushPromises()
     expect(router.currentRoute.value.path).toBe('/skills')
 
-    wm.close()
+    wm.close('skills')
     await flushPromises()
     expect(router.currentRoute.value.path).toBe('/')
   })
 
-  it('closes the window when navigating back to /', async () => {
-    const router = await mountAt('/education')
+  it('follows focus to the next window when the focused one closes', async () => {
+    const router = await mountAt('/')
     const wm = useWindowManager()
-    expect(wm.isOpen.value).toBe(true)
 
-    await router.push('/')
+    wm.open('about')
+    wm.open('skills')
     await flushPromises()
+    expect(router.currentRoute.value.path).toBe('/skills')
 
-    expect(wm.isOpen.value).toBe(false)
+    wm.close('skills')
+    await flushPromises()
+    expect(router.currentRoute.value.path).toBe('/about')
   })
 
-  it('redirects non-window ids to /', async () => {
+  it('opens a second window from a deep link without closing the first', async () => {
+    const router = await mountAt('/')
+    const wm = useWindowManager()
+    wm.open('about')
+    await flushPromises()
+
+    await router.push('/skills')
+    await flushPromises()
+
+    expect(wm.windows.value.map((win) => win.id)).toEqual(['about', 'skills'])
+    expect(wm.focusedId.value).toBe('skills')
+  })
+
+  it('redirects a non-window id to /', async () => {
     const router = await mountAt('/resume')
     const wm = useWindowManager()
 
-    expect(wm.openId.value).toBe(null)
+    expect(wm.focusedId.value).toBe(null)
     expect(router.currentRoute.value.path).toBe('/')
   })
 })

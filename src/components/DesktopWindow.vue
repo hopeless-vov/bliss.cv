@@ -3,20 +3,22 @@ import XpWindow from '@/components/ui/XpWindow.vue'
 import WindowContent from '@/components/WindowContent.vue'
 import { useContextMenu } from '@/composables/use-context-menu'
 import { useDynamicText } from '@/composables/use-dynamic-text'
-import { useFocusTrap } from '@/composables/use-focus-trap'
 import { usePointerDrag } from '@/composables/use-pointer-drag'
 import { useStartMenu } from '@/composables/use-start-menu'
 import { useWindowManager } from '@/composables/use-window-manager'
 import { DESKTOP_ITEMS } from '@/config/desktop-items'
-import { computed, nextTick, ref, watch } from 'vue'
+import type { WindowState } from '@/stores/windows'
+import { computed, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const td = useDynamicText()
-const { openId, isVisible, isMaximized, position, close, minimize, toggleMaximize, moveTo } =
+const { windows, focusedId, isMobile, focus, close, minimize, toggleMaximize, moveTo } =
   useWindowManager()
 const { close: closeStartMenu } = useStartMenu()
 const { close: closeContextMenu } = useContextMenu()
+
+const ITEM_BY_ID = new Map(DESKTOP_ITEMS.map((item) => [item.id, item]))
 
 const menu = computed(() => [
   t('menubar.file'),
@@ -25,71 +27,107 @@ const menu = computed(() => [
   t('menubar.help'),
 ])
 
-const openItem = computed(() => DESKTOP_ITEMS.find((item) => item.id === openId.value) ?? null)
-const windowTitle = computed(() =>
-  openItem.value?.i18nBase ? td(`${openItem.value.i18nBase}.title`) : '',
+// Minimized windows are dropped from the DOM (not just hidden), matching the
+// original single-window behaviour; the taskbar still lists them.
+const views = computed(() =>
+  windows.value
+    .filter((win) => !win.minimized)
+    .map((win) => {
+      const item = ITEM_BY_ID.get(win.id) ?? null
+      return {
+        win,
+        item,
+        title: item?.i18nBase ? td(`${item.i18nBase}.title`) : '',
+        maximized: win.maximized || isMobile.value,
+      }
+    }),
 )
 
-const root = ref<HTMLElement | null>(null)
-useFocusTrap(root, () => isVisible.value)
-
-// Move focus into the window when it opens, so keyboard users land inside it.
-watch(isVisible, async (visible) => {
-  if (visible) {
-    await nextTick()
-    root.value?.focus()
+// Focus a window when it first appears (opens or restores) so keyboard users
+// land inside it. Merely raising an existing window (a click) must NOT steal
+// focus from what was clicked, so this keys off appearance, not the focused id.
+const roots = new Map<string, HTMLElement>()
+function setRoot(id: string, el: unknown): void {
+  if (el) {
+    roots.set(id, el as HTMLElement)
+  } else {
+    roots.delete(id)
   }
-})
+}
 
-const drag = usePointerDrag((x, y) => moveTo(x, y))
+watch(
+  () => views.value.map((view) => view.win.id),
+  async (ids, previous) => {
+    const appeared = ids.find((id) => !previous.includes(id))
+    if (!appeared) {
+      return
+    }
+    await nextTick()
+    roots.get(appeared)?.focus()
+  },
+  { flush: 'post' },
+)
 
-function onTitlebarPointerDown(event: PointerEvent): void {
+const drag = usePointerDrag<string>((x, y, id) => moveTo(id, x, y))
+
+function onTitlebarPointerDown(win: WindowState, event: PointerEvent): void {
   closeStartMenu()
   closeContextMenu()
-  if (!isMaximized.value) {
-    drag.start(event, position.value)
+  if (!(win.maximized || isMobile.value)) {
+    drag.start(event, win.position, win.id)
   }
+}
+
+function styleFor(view: { win: WindowState; maximized: boolean }): Record<string, string | number> {
+  // `--stack` orders windows within the z-window band (the base lives in the
+  // token, see main.css); position is only needed when not maximized.
+  const stack = { '--stack': view.win.z }
+  return view.maximized
+    ? stack
+    : { ...stack, left: `${view.win.position.x}px`, top: `${view.win.position.y}px` }
 }
 </script>
 
 <template>
-  <Transition name="xp-window">
+  <TransitionGroup name="xp-window">
     <div
-      v-if="isVisible && openItem"
-      ref="root"
+      v-for="view in views"
+      :key="view.win.id"
+      :ref="(el) => setRoot(view.win.id, el)"
       role="dialog"
-      aria-modal="true"
-      :aria-label="windowTitle"
+      :aria-label="view.title"
       tabindex="-1"
       class="absolute z-window outline-none"
       :class="
-        isMaximized
+        view.maximized
           ? 'top-0 right-0 bottom-8 left-0'
           : 'h-[min(540px,calc(100dvh-90px))] w-[min(740px,94vw)]'
       "
-      :style="isMaximized ? undefined : { left: `${position.x}px`, top: `${position.y}px` }"
+      :style="styleFor(view)"
+      @pointerdown="focus(view.win.id)"
     >
       <XpWindow
-        :title="`C:\\Portfolio\\${windowTitle}`"
+        :title="`C:\\Portfolio\\${view.title}`"
         :menu="menu"
-        :maximized="isMaximized"
+        :active="view.win.id === focusedId"
+        :maximized="view.maximized"
         class="h-full w-full"
-        @close="close"
-        @minimize="minimize"
-        @maximize="toggleMaximize"
-        @titlebar-pointer-down="onTitlebarPointerDown"
-        @titlebar-dblclick="toggleMaximize"
+        @close="close(view.win.id)"
+        @minimize="minimize(view.win.id)"
+        @maximize="toggleMaximize(view.win.id)"
+        @titlebar-pointer-down="onTitlebarPointerDown(view.win, $event)"
+        @titlebar-dblclick="toggleMaximize(view.win.id)"
       >
         <template #icon>
           <span class="block h-3.5 w-3.5 rounded-xs bg-white" />
         </template>
 
         <WindowContent
-          v-if="openItem.kind && openItem.i18nBase"
-          :kind="openItem.kind"
-          :base="openItem.i18nBase"
+          v-if="view.item?.kind && view.item?.i18nBase"
+          :kind="view.item.kind"
+          :base="view.item.i18nBase"
         />
       </XpWindow>
     </div>
-  </Transition>
+  </TransitionGroup>
 </template>

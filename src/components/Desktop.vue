@@ -25,7 +25,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 const { isBooting, isShutdown, isBalloonVisible, boot, skipBoot, dismissBalloon } = usePower()
 const { isOpen: isStartMenuOpen, close: closeStartMenu } = useStartMenu()
-const { isVisible: isWindowVisible, openId, close: closeWindow } = useWindowManager()
+const { windows, focusedId, closeFocused } = useWindowManager()
 const { clearSelection } = useDesktop()
 const { notes } = useNotes()
 const { wallpaperClass, cursorClass } = useSettings()
@@ -46,11 +46,17 @@ watch(isBooting, (booting) => {
   if (!booting && assistant.enabled.value) assistant.greet()
 })
 
-// React to whichever window opens, keyed on its content kind.
-watch(openId, (id) => {
-  const kind = DESKTOP_ITEMS.find((item) => item.id === id)?.kind
-  if (kind) assistant.react({ type: 'open', kind })
-})
+// React whenever a new window opens, keyed on its content kind. Raising or
+// closing existing windows doesn't re-trigger it.
+watch(
+  () => windows.value.map((win) => win.id),
+  (ids, previous) => {
+    const opened = ids.find((id) => !previous.includes(id))
+    if (!opened) return
+    const kind = DESKTOP_ITEMS.find((item) => item.id === opened)?.kind
+    if (kind) assistant.react({ type: 'open', kind })
+  },
+)
 
 // React when a new sticky note appears (from the icon or the context menu).
 watch(
@@ -60,14 +66,14 @@ watch(
   },
 )
 
-// Escape closes the topmost overlay: context menu → start menu → window.
+// Escape closes the topmost overlay: context menu → start menu → focused window.
 useEscapeKey(() => {
   if (contextMenu.isOpen.value) {
     contextMenu.close()
   } else if (isStartMenuOpen.value) {
     closeStartMenu()
-  } else if (isWindowVisible.value) {
-    closeWindow()
+  } else if (focusedId.value) {
+    closeFocused()
   }
 })
 

@@ -8,91 +8,170 @@ function setViewport(w: number, h: number): void {
   window.dispatchEvent(new Event('resize'))
 }
 
+function positionOf(wm: ReturnType<typeof useWindowManager>, id: string) {
+  return wm.windows.value.find((win) => win.id === id)?.position
+}
+
 describe('useWindowManager', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     setViewport(1200, 800)
   })
 
-  it('opens a window centred and visible', () => {
+  it('opens a window centred, visible and focused', () => {
     const wm = useWindowManager()
     wm.open('about')
 
-    expect(wm.openId.value).toBe('about')
-    expect(wm.isOpen.value).toBe(true)
-    expect(wm.isVisible.value).toBe(true)
-    expect(wm.position.value).toEqual({ x: (1200 - 740) / 2, y: (800 - 32 - 540) / 2 })
+    expect(wm.isOpen('about')).toBe(true)
+    expect(wm.isVisible('about')).toBe(true)
+    expect(wm.focusedId.value).toBe('about')
+    expect(positionOf(wm, 'about')).toEqual({ x: (1200 - 740) / 2, y: (800 - 32 - 540) / 2 })
   })
 
-  it('cascades position when switching to another window', () => {
+  it('opens each further window cascaded off the top-most, side by side', () => {
     const wm = useWindowManager()
     wm.open('about')
-    const first = { ...wm.position.value }
+    const first = { ...positionOf(wm, 'about')! }
 
     wm.open('skills')
 
-    expect(wm.openId.value).toBe('skills')
-    expect(wm.position.value).toEqual({ x: first.x + 18, y: first.y + 18 })
+    // Both stay open — the second does not replace the first.
+    expect(wm.windows.value.map((win) => win.id)).toEqual(['about', 'skills'])
+    expect(positionOf(wm, 'skills')).toEqual({ x: first.x + 18, y: first.y + 18 })
+    expect(wm.focusedId.value).toBe('skills')
   })
 
-  it('keeps position and restores when re-opening the same window', () => {
+  it('re-opening an open window focuses it instead of duplicating', () => {
     const wm = useWindowManager()
     wm.open('about')
-    const pos = { ...wm.position.value }
-    wm.minimize()
-    expect(wm.isVisible.value).toBe(false)
+    wm.open('skills')
+    expect(wm.focusedId.value).toBe('skills')
 
     wm.open('about')
 
-    expect(wm.isVisible.value).toBe(true)
-    expect(wm.position.value).toEqual(pos)
+    expect(wm.windows.value).toHaveLength(2)
+    expect(wm.focusedId.value).toBe('about')
   })
 
-  it('toggleMinimized flips between minimized and restored', () => {
+  it('re-opening a minimized window restores and focuses it', () => {
     const wm = useWindowManager()
     wm.open('about')
+    wm.minimize('about')
+    expect(wm.isVisible('about')).toBe(false)
 
-    wm.toggleMinimized()
-    expect(wm.isVisible.value).toBe(false)
+    wm.open('about')
 
-    wm.toggleMinimized()
-    expect(wm.isVisible.value).toBe(true)
+    expect(wm.isVisible('about')).toBe(true)
+    expect(wm.focusedId.value).toBe('about')
   })
 
-  it('minimizes, restores and closes', () => {
+  it('focus raises a window above the others', () => {
     const wm = useWindowManager()
     wm.open('about')
+    wm.open('skills')
+    expect(wm.focusedId.value).toBe('skills')
 
-    wm.minimize()
-    expect(wm.isVisible.value).toBe(false)
-    wm.restore()
-    expect(wm.isVisible.value).toBe(true)
+    wm.focus('about')
 
-    wm.close()
-    expect(wm.isOpen.value).toBe(false)
-    expect(wm.openId.value).toBe(null)
+    expect(wm.focusedId.value).toBe('about')
   })
 
-  it('toggles maximize on desktop', () => {
+  it('minimize hides a window and hands focus to the next visible one', () => {
     const wm = useWindowManager()
     wm.open('about')
+    wm.open('skills')
 
-    expect(wm.isMaximized.value).toBe(false)
-    wm.toggleMaximize()
-    expect(wm.isMaximized.value).toBe(true)
-    wm.toggleMaximize()
-    expect(wm.isMaximized.value).toBe(false)
+    wm.minimize('skills')
+
+    expect(wm.isVisible('skills')).toBe(false)
+    expect(wm.focusedId.value).toBe('about')
   })
 
-  it('clamps dragged positions to the viewport', () => {
+  it('restore shows a window and brings it forward', () => {
+    const wm = useWindowManager()
+    wm.open('about')
+    wm.open('skills')
+    wm.minimize('skills')
+
+    wm.restore('skills')
+
+    expect(wm.isVisible('skills')).toBe(true)
+    expect(wm.focusedId.value).toBe('skills')
+  })
+
+  it('toggleMinimized restores, minimizes or raises depending on state', () => {
+    const wm = useWindowManager()
+    wm.open('about')
+    wm.open('skills')
+
+    // Focused window → minimize.
+    wm.toggleMinimized('skills')
+    expect(wm.isVisible('skills')).toBe(false)
+
+    // Minimized window → restore + focus.
+    wm.toggleMinimized('skills')
+    expect(wm.isVisible('skills')).toBe(true)
+    expect(wm.focusedId.value).toBe('skills')
+
+    // Non-focused visible window → just raise it.
+    wm.toggleMinimized('about')
+    expect(wm.focusedId.value).toBe('about')
+    expect(wm.isVisible('about')).toBe(true)
+
+    // Unknown id → no-op.
+    wm.toggleMinimized('missing')
+    expect(wm.focusedId.value).toBe('about')
+  })
+
+  it('closes a window and closes the focused one', () => {
+    const wm = useWindowManager()
+    wm.open('about')
+    wm.open('skills')
+
+    wm.closeFocused()
+    expect(wm.isOpen('skills')).toBe(false)
+    expect(wm.focusedId.value).toBe('about')
+
+    wm.close('about')
+    expect(wm.isOpen('about')).toBe(false)
+    expect(wm.focusedId.value).toBe(null)
+
+    // Nothing focused → closeFocused is a no-op.
+    wm.closeFocused()
+    expect(wm.windows.value).toEqual([])
+  })
+
+  it('toggles maximize per window and ignores unknown ids', () => {
     const wm = useWindowManager()
     wm.open('about')
 
-    wm.moveTo(999999, 999999)
-    expect(wm.position.value).toEqual({ x: 1200 - 60, y: 800 - 80 })
+    expect(wm.isMaximized('about')).toBe(false)
+    wm.toggleMaximize('about')
+    expect(wm.isMaximized('about')).toBe(true)
+    wm.toggleMaximize('about')
+    expect(wm.isMaximized('about')).toBe(false)
 
-    wm.moveTo(-999999, -999999)
-    expect(wm.position.value).toEqual({ x: -600, y: 0 })
+    wm.toggleMaximize('missing')
+    expect(wm.isMaximized('about')).toBe(false)
+  })
+
+  it('clamps a dragged window to the viewport', () => {
+    const wm = useWindowManager()
+    wm.open('about')
+
+    wm.moveTo('about', 999999, 999999)
+    expect(positionOf(wm, 'about')).toEqual({ x: 1200 - 60, y: 800 - 80 })
+
+    wm.moveTo('about', -999999, -999999)
+    expect(positionOf(wm, 'about')).toEqual({ x: -600, y: 0 })
+  })
+
+  it('reports not-open windows as hidden and not maximized', () => {
+    const wm = useWindowManager()
+
+    expect(wm.isOpen('about')).toBe(false)
+    expect(wm.isVisible('about')).toBe(false)
+    expect(wm.isMaximized('about')).toBe(false)
   })
 
   it('forces windows to be maximized on mobile viewports', () => {
@@ -101,6 +180,6 @@ describe('useWindowManager', () => {
     wm.open('about')
 
     expect(wm.isMobile.value).toBe(true)
-    expect(wm.isMaximized.value).toBe(true)
+    expect(wm.isMaximized('about')).toBe(true)
   })
 })

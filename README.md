@@ -103,7 +103,7 @@ The whole app is one desktop. Content is static and edited in `src/locales/en.js
 src/
   components/
     ui/          → XP presentational primitives (XpWindow, XpTitleBar, DesktopIcon, BootScreen,
-                   ShutdownScreen, StartButton, TaskbarButton, TaskbarClock, XpIcon…).
+                   ShutdownScreen, StartButton, TaskbarButton, TaskbarClock, XpIcon, BlueScreen…).
                    Props in, events out. No logic.
     (root)       → Smart components (Desktop, DesktopWindow, DesktopIcons, Taskbar, StartMenu,
                    ContextMenu, StickyNotes, WindowContent, Minesweeper, InternetExplorer) that
@@ -140,8 +140,10 @@ src/
                    assistant runtime (agent/animator/balloon/queue) + 10 agents, each with a
                    real map.png sprite + mp3 sounds. Kept as-is (`@ts-nocheck` on the runtime);
                    Vite code-splits every agent so only the chosen one's sprite loads on demand.
-  views/         → Route-level containers. DesktopView is the single route.
-  router/        → Route definitions (optional :windowId deep-links a window open).
+  views/         → Route-level containers. DesktopView (the desktop) + NotFoundView
+                   (a Blue-Screen-of-Death 404 for any unknown path).
+  router/        → Route definitions: `/` and `/:windowId` (constrained to real window ids)
+                   → DesktopView; everything else → NotFoundView.
   locales/       → en.json — all user-visible text and CV content, tree-organized for easy editing.
   i18n.d.ts      → Types en.json as the vue-i18n message schema (typos in static keys fail the build).
   styles/        → main.css — Tailwind entry + @theme XP "Luna" colour tokens + named z-index scale.
@@ -182,9 +184,7 @@ A Clippy-style companion (vendored from clippyjs — see `src/lib/`). It's **on 
 
 > **Note:** agents ship uncompressed sprites (`src/lib/clippy/agents/*/map.png`, ~0.7–1.9 MB each) and mp3 sounds — kept as-is from upstream, worth compressing before a production deploy.
 
-Wallpapers are bundled local photos in `src/assets/` (`bliss.webp`, `green-hills.webp`, `sunset-field.webp`, `night-sky.webp`) — no remote URLs. **Bliss** (the real default Windows XP wallpaper) is the app's default.
-
-> **Note:** `src/assets/green-hills.webp` is ~13.9 MB — fine since it's not the default and only loads if a visitor picks it, but worth compressing (e.g. to a few hundred KB) before a production deploy.
+Wallpapers are bundled local photos in `src/assets/` (`bliss.webp`, `green-hills.webp`, `sunset-field.webp`, `night-sky.webp`) — no remote URLs, all compressed to a few hundred KB each. **Bliss** (the real default Windows XP wallpaper) is the app's default.
 
 ### Deep links
 
@@ -229,9 +229,9 @@ A faithful Windows XP "Luna" theme. All colours are named tokens in `src/styles/
 
 ## Deployment
 
-Static SPA — deploy the `dist/` output anywhere. `vercel.json` rewrites every route to `index.html` so deep links (`/vesper`, `/about`) survive a hard refresh; on Netlify use a `_redirects` equivalent.
+Static SPA — deploy the `dist/` output anywhere. `vercel.json` rewrites every route to `index.html` so deep links (`/vesper`, `/about`) survive a hard refresh; on Netlify use a `_redirects` equivalent. An unknown path (e.g. a typo'd deep link) renders the Blue-Screen-of-Death 404 view. `public/robots.txt` and `public/sitemap.xml` are served from the site root — **update the domain in both** before deploying.
 
-> **TODO:** add `public/og-image.png` (1200×630) — `index.html` references it for social previews. A screenshot of the desktop works well.
+> **TODO:** add `public/og-image.png` (1200×630) — `index.html` references it for social previews (`og:image` + `twitter:image`). A screenshot of the desktop works well; until it's added, link previews show a broken image.
 
 ---
 

@@ -128,6 +128,7 @@ score persisted).
 
 - **Boot** (`z-7000`, black): the "Bondarenko® / Volodymyr®cv" logotype (a play on the "Microsoft® / Windows®xp" lockup — `cv` in Luna orange) with a large XP flag to the right of the "Bondarenko®" line, bottom-aligned so it tucks close to "Volodymyr®cv" below + a 220×18 loader (3 blue blocks, `xpload` 1.6s linear infinite). Auto-dismiss after **3.4s** or click to skip. Straight to the desktop afterwards — no welcome balloon.
 - **Shutdown** (`z-5000`, black): orange "It is now safe to close this tab." Click → reboot (re-runs boot).
+- **404** (`NotFoundView`): a full-screen Blue-Screen-of-Death (`#0827c7`, Lucida Console) for any path that isn't `/` or a real window id — "ERROR 404" panel, mock STOP technical block, and two beveled buttons (Restart / Turn Off) that both return to the booting desktop. It's a route-level view, not an overlay, so it sits outside the z-index scale.
 
 ## Interactions
 

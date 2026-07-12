@@ -24,11 +24,11 @@ function openItem(id: string): void {
   >
     <header class="xp-startmenu-header flex items-center gap-3 p-2">
       <span
-        class="xp-avatar grid h-10.5 w-10.5 shrink-0 place-items-center rounded-sm border border-white/60 text-[16px] font-bold text-white"
+        class="xp-avatar grid h-10.5 w-10.5 shrink-0 place-items-center rounded-sm border border-white/60 text-base font-bold text-white"
       >
         {{ t('startMenu.initials') }}
       </span>
-      <span class="xp-title-shadow text-[14px] font-bold text-white">
+      <span class="xp-title-shadow text-sm font-bold text-white">
         {{ t('startMenu.username') }}
       </span>
     </header>

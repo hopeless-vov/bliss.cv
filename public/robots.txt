@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://bliss-cv.vercel.app/sitemap.xml
+Sitemap: https://vov-bndrnk-cv.vercel.app/sitemap.xml

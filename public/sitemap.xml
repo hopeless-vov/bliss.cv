@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Update the domain below to your production URL before deploying. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://bliss-cv.vercel.app/</loc><lastmod>2026-07-12</lastmod><priority>1.0</priority></url>
-  <url><loc>https://bliss-cv.vercel.app/about</loc><lastmod>2026-07-12</lastmod><priority>0.9</priority></url>
-  <url><loc>https://bliss-cv.vercel.app/skills</loc><lastmod>2026-07-12</lastmod><priority>0.8</priority></url>
-  <url><loc>https://bliss-cv.vercel.app/education</loc><lastmod>2026-07-12</lastmod><priority>0.7</priority></url>
-  <url><loc>https://bliss-cv.vercel.app/contact</loc><lastmod>2026-07-12</lastmod><priority>0.8</priority></url>
-  <url><loc>https://bliss-cv.vercel.app/vesper</loc><lastmod>2026-07-12</lastmod><priority>0.7</priority></url>
-  <url><loc>https://bliss-cv.vercel.app/worth</loc><lastmod>2026-07-12</lastmod><priority>0.6</priority></url>
-  <url><loc>https://bliss-cv.vercel.app/frozeneon</loc><lastmod>2026-07-12</lastmod><priority>0.6</priority></url>
-  <url><loc>https://bliss-cv.vercel.app/quinta</loc><lastmod>2026-07-12</lastmod><priority>0.6</priority></url>
-  <url><loc>https://bliss-cv.vercel.app/surelock</loc><lastmod>2026-07-12</lastmod><priority>0.6</priority></url>
-  <url><loc>https://bliss-cv.vercel.app/recycle</loc><lastmod>2026-07-12</lastmod><priority>0.5</priority></url>
+  <url><loc>https://vov-bndrnk-cv.vercel.app/</loc><lastmod>2026-07-12</lastmod><priority>1.0</priority></url>
+  <url><loc>https://vov-bndrnk-cv.vercel.app/about</loc><lastmod>2026-07-12</lastmod><priority>0.9</priority></url>
+  <url><loc>https://vov-bndrnk-cv.vercel.app/skills</loc><lastmod>2026-07-12</lastmod><priority>0.8</priority></url>
+  <url><loc>https://vov-bndrnk-cv.vercel.app/education</loc><lastmod>2026-07-12</lastmod><priority>0.7</priority></url>
+  <url><loc>https://vov-bndrnk-cv.vercel.app/contact</loc><lastmod>2026-07-12</lastmod><priority>0.8</priority></url>
+  <url><loc>https://vov-bndrnk-cv.vercel.app/vesper</loc><lastmod>2026-07-12</lastmod><priority>0.7</priority></url>
+  <url><loc>https://vov-bndrnk-cv.vercel.app/worth</loc><lastmod>2026-07-12</lastmod><priority>0.6</priority></url>
+  <url><loc>https://vov-bndrnk-cv.vercel.app/frozeneon</loc><lastmod>2026-07-12</lastmod><priority>0.6</priority></url>
+  <url><loc>https://vov-bndrnk-cv.vercel.app/quinta</loc><lastmod>2026-07-12</lastmod><priority>0.6</priority></url>
+  <url><loc>https://vov-bndrnk-cv.vercel.app/surelock</loc><lastmod>2026-07-12</lastmod><priority>0.6</priority></url>
+  <url><loc>https://vov-bndrnk-cv.vercel.app/recycle</loc><lastmod>2026-07-12</lastmod><priority>0.5</priority></url>
 </urlset>

@@ -10,6 +10,19 @@
     "role": "Software Engineer · Amsterdam, NL",
     "skip": "click to skip"
   },
+  "notFound": {
+    "code": "ERROR 404",
+    "intro": "A problem has been detected and the page you requested could not be found. This page has been shut down to prevent damage to your browsing experience.",
+    "errorId": "PAGE_NOT_FOUND",
+    "advice": "If this is the first time you've seen this stop error screen, don't panic. The page may simply never have existed. If this screen appears again, follow these steps:",
+    "steps": "Check that you typed the address correctly. Go back to the desktop and open a file that actually exists. Or just enjoy the view — everything here still works.",
+    "tech1": "Technical information:",
+    "tech2": "*** STOP: 0x00000404 (0xPORT, 0xF0L10, 0x00404, 0xN0TF0UND)",
+    "tech3": "*** portfolio.sys — Address 0x404 base at 0xVB2026",
+    "restart": "Restart Computer",
+    "turnOff": "Turn Off Computer",
+    "hint": "Press a button above to continue _"
+  },
   "shutdown": {
     "safe": "It is now safe to close this tab.",
     "reboot": "…or click anywhere to boot back up"

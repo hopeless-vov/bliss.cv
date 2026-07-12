@@ -63,6 +63,12 @@
   --color-ie-border-strong: #a9a48f;
   --color-ie-field-border: #7f9db9;
 
+  /* Blue Screen of Death (the 404 page) */
+  --color-bsod: #0827c7;
+  --color-bsod-panel: #c7c7c7;
+  --color-bsod-dim: #cdd8ff;
+  --color-bsod-hint: #9fb3ff;
+
   /* Sticky notes */
   --color-note: #fdf7b2;
   --color-note-border: #c9bd5a;

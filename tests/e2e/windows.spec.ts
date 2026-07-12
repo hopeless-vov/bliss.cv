@@ -97,4 +97,26 @@ test.describe('window lifecycle', () => {
     // Both are still listed on the taskbar.
     await expect(page.getByTestId('taskbar-window-button')).toHaveCount(2)
   })
+
+  test('a first-time visitor lands on About and Contact open', async ({ page }) => {
+    // No `xp-visited` set → this is a fresh first visit. Assistant off so it
+    // can't shadow the windows.
+    await page.addInitScript(() => window.localStorage.setItem('xp-assistant', 'false'))
+    await page.goto('/')
+    await page.getByTestId('boot-screen').click()
+
+    await expect(windowByTitle(page, 'Volodymyr Bondarenko')).toBeVisible()
+    await expect(windowByTitle(page, 'Contact')).toBeVisible()
+    await expect(page.getByTestId('taskbar-window-button')).toHaveCount(2)
+  })
+
+  test('opens an icon with a single tap on a phone viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 700 })
+    await bootDesktop(page)
+
+    // A single click (not double) opens the window on mobile.
+    await page.getByRole('button', { name: 'About_Me.txt', exact: true }).click()
+
+    await expect(windowByTitle(page, 'Volodymyr Bondarenko')).toBeVisible()
+  })
 })

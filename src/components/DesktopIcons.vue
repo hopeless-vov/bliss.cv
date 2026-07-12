@@ -3,12 +3,14 @@ import DesktopIcon from '@/components/ui/DesktopIcon.vue'
 import { useDesktop } from '@/composables/use-desktop'
 import { useDynamicText } from '@/composables/use-dynamic-text'
 import { useIconPositions } from '@/composables/use-icon-positions'
+import { useIsMobile } from '@/composables/use-is-mobile'
 import { usePointerDrag } from '@/composables/use-pointer-drag'
 import { DESKTOP_ITEMS } from '@/config/desktop-items'
 
 const t = useDynamicText()
 const { selectedId, select, activate } = useDesktop()
 const { positionFor, moveIcon } = useIconPositions()
+const isMobile = useIsMobile()
 
 const { start } = usePointerDrag<string>((x, y, id) => moveIcon(id, x, y))
 
@@ -28,6 +30,7 @@ function onPointerDown(id: string, event: PointerEvent): void {
       :label="t(`icons.${item.id}`)"
       :icon="item.icon"
       :selected="selectedId === item.id"
+      :single-click="isMobile"
       @select="select(item.id)"
       @open="activate(item)"
       @pointerdown="onPointerDown(item.id, $event)"

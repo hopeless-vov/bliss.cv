@@ -11,7 +11,6 @@ describe('shell store', () => {
     const store = useShellStore()
 
     expect(store.booting).toBe(true)
-    expect(store.balloonVisible).toBe(false)
     expect(store.shutdown).toBe(false)
     expect(store.startMenuOpen).toBe(false)
   })
@@ -20,12 +19,10 @@ describe('shell store', () => {
     const store = useShellStore()
 
     store.setBooting(false)
-    store.setBalloonVisible(true)
     store.setShutdown(true)
     store.setStartMenuOpen(true)
 
     expect(store.booting).toBe(false)
-    expect(store.balloonVisible).toBe(true)
     expect(store.shutdown).toBe(true)
     expect(store.startMenuOpen).toBe(true)
   })

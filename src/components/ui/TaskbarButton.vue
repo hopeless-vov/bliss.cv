@@ -1,5 +1,10 @@
 <script setup lang="ts">
-withDefaults(defineProps<{ label: string; active?: boolean }>(), { active: false })
+import XpIcon from '@/components/ui/XpIcon.vue'
+import type { XpIconName } from '@/types/desktop'
+
+withDefaults(defineProps<{ label: string; icon: XpIconName; active?: boolean }>(), {
+  active: false,
+})
 defineEmits<{ click: [] }>()
 </script>
 
@@ -11,7 +16,10 @@ defineEmits<{ click: [] }>()
     :class="active ? 'xp-taskbar-btn-active' : 'xp-taskbar-btn'"
     @click="$emit('click')"
   >
-    <span class="h-3 w-3 shrink-0 rounded-xs bg-white/90" />
+    <XpIcon
+      :name="icon"
+      class="h-4 w-4 shrink-0"
+    />
     <span class="truncate">{{ label }}</span>
   </button>
 </template>

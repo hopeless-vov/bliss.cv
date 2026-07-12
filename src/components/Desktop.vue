@@ -5,13 +5,13 @@ import DesktopWindow from '@/components/DesktopWindow.vue'
 import StartMenu from '@/components/StartMenu.vue'
 import StickyNotes from '@/components/StickyNotes.vue'
 import Taskbar from '@/components/Taskbar.vue'
-import BalloonTip from '@/components/ui/BalloonTip.vue'
 import BootScreen from '@/components/ui/BootScreen.vue'
 import ShutdownScreen from '@/components/ui/ShutdownScreen.vue'
 import { useAssistant } from '@/composables/use-assistant'
 import { useContextMenu } from '@/composables/use-context-menu'
 import { useDesktop } from '@/composables/use-desktop'
 import { useEscapeKey } from '@/composables/use-escape-key'
+import { useFirstRun } from '@/composables/use-first-run'
 import { useNotes } from '@/composables/use-notes'
 import { usePower } from '@/composables/use-power'
 import { useSettings } from '@/composables/use-settings'
@@ -23,10 +23,11 @@ import { onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
-const { isBooting, isShutdown, isBalloonVisible, boot, skipBoot, dismissBalloon } = usePower()
+const { isBooting, isShutdown, boot, skipBoot } = usePower()
 const { isOpen: isStartMenuOpen, close: closeStartMenu } = useStartMenu()
-const { windows, focusedId, closeFocused } = useWindowManager()
+const { windows, focusedId, closeFocused, openDefaultLayout } = useWindowManager()
 const { clearSelection } = useDesktop()
+const { isFirstRun, markSeen } = useFirstRun()
 const { notes } = useNotes()
 const { wallpaperClass, cursorClass } = useSettings()
 const assistant = useAssistant()
@@ -36,8 +37,14 @@ useWindowRouter()
 
 onMounted(() => {
   boot()
+  // First-time visitors land on About + Contact open (unless a deep link
+  // already opened a window); returning visitors get a clean desktop.
+  if (isFirstRun() && windows.value.length === 0) {
+    openDefaultLayout()
+  }
+  markSeen()
   // Loads during the boot screen so the download goes unnoticed; the guard is
-  // inside load() (no-op when disabled).
+  // inside load() (no-op when disabled or on mobile).
   void assistant.load()
 })
 
@@ -119,13 +126,6 @@ function onDesktopContextMenu(event: MouseEvent): void {
 
     <Taskbar />
 
-    <BalloonTip
-      v-if="isBalloonVisible"
-      :title="t('welcome.title')"
-      :body="t('welcome.body')"
-      @close="dismissBalloon"
-    />
-
     <ShutdownScreen
       v-if="isShutdown"
       :message="t('shutdown.safe')"
@@ -138,6 +138,7 @@ function onDesktopContextMenu(event: MouseEvent): void {
       :name="t('boot.name')"
       :title="t('boot.title')"
       :xp="t('boot.xp')"
+      :reg="t('boot.reg')"
       :role="t('boot.role')"
       :skip-label="t('boot.skip')"
       @skip="skipBoot"

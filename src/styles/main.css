@@ -51,7 +51,6 @@
   --color-highlight: #316ac5; /* selection blue */
   --color-luna-orange: #ff8c00;
   --color-icon-select: #0b3fbf; /* desktop icon selection */
-  --color-balloon: #ffffe1; /* classic pale-yellow tooltip */
 
   /* Sticky notes */
   --color-note: #fdf7b2;
@@ -122,9 +121,6 @@
   }
   .z-start-menu {
     z-index: 1001;
-  }
-  .z-balloon {
-    z-index: 2000;
   }
   .z-context-menu {
     z-index: 3000;
@@ -258,17 +254,6 @@
 
   .xp-wall-none {
     background-image: none;
-  }
-
-  /* Balloon tip pointer (classic black-bordered triangle). */
-  .xp-balloon-arrow::after {
-    content: '';
-    position: absolute;
-    right: 18px;
-    bottom: -8px;
-    border: 8px solid transparent;
-    border-top-color: #000;
-    border-bottom: 0;
   }
 
   .xp-boot-blocks {

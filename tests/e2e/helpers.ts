@@ -1,21 +1,22 @@
 import type { Page } from '@playwright/test'
 
 /*
- * Every test starts the same way: land on the desktop, skip the 3.4s boot
- * screen, and dismiss the welcome balloon (usePower always shows it after
- * boot) so it can't shadow other "Close" buttons in later assertions.
+ * Every test starts the same way: land on the desktop and skip the 3.4s boot
+ * screen. `xp-visited` is pre-set so the first-visit default layout (About +
+ * Contact) doesn't seed windows over the assertions — the `windows.spec.ts`
+ * first-visit test opts out to check that behaviour directly.
  *
  * The assistant is disabled by default here: it's on for real visitors, but a
  * floating agent would otherwise sit over click targets and make assertions
  * flaky. The `assistant.spec.ts` suite opts back in to test it directly.
  */
 export async function bootDesktop(page: Page, path = '/', assistant = false): Promise<void> {
+  await page.addInitScript(() => window.localStorage.setItem('xp-visited', 'true'))
   if (!assistant) {
     await page.addInitScript(() => window.localStorage.setItem('xp-assistant', 'false'))
   }
   await page.goto(path)
   await page.getByTestId('boot-screen').click()
-  await page.getByTestId('balloon-close').click()
 }
 
 /* An open window, scoped so "Close"/"Minimize"/"Maximize" queries never clash with other overlays. */

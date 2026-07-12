@@ -103,14 +103,14 @@ The whole app is one desktop. Content is static and edited in `src/locales/en.js
 src/
   components/
     ui/          → XP presentational primitives (XpWindow, XpTitleBar, DesktopIcon, BootScreen,
-                   BalloonTip, ShutdownScreen, StartButton, TaskbarButton, TaskbarClock, XpIcon…).
+                   ShutdownScreen, StartButton, TaskbarButton, TaskbarClock, XpIcon…).
                    Props in, events out. No logic.
     (root)       → Smart components (Desktop, DesktopWindow, DesktopIcons, Taskbar, StartMenu,
                    ContextMenu, StickyNotes, WindowContent) that wire ui/ to composables.
   composables/   → All logic, each with a unit test:
                    use-window-manager (multi-window: open/focus/close/min/max/stacking + mobile),
                    use-window-router (URL ↔ focused-window deep-link sync),
-                   use-power (boot → balloon → shutdown lifecycle),
+                   use-power (boot → shutdown lifecycle),
                    use-notes (local sticky notes: spawn/drag/edit/delete),
                    use-icon-positions (drag + persisted grid, Arrange Icons),
                    use-pointer-drag (generic drag for windows/notes/icons),
@@ -118,6 +118,7 @@ src/
                    use-settings (wallpaper, cursor theme), use-context-menu,
                    use-assistant (desktop assistant: load/enable/disable/switch + reactions),
                    use-escape-key (a11y), use-dynamic-text (runtime i18n keys),
+                   use-is-mobile (phone-sized viewport flag), use-first-run (first-visit gate),
                    use-start-menu, use-start-menu-items, use-window-content, use-clock.
   stores/        → Thin Pinia state containers (windows, shell, notes, settings, assistant,
                    desktop, icon-positions, context-menu).
@@ -164,11 +165,13 @@ docs/
 
 Right-click the desktop for the context menu: **New Note**, **Arrange Icons** (resets dragged icons to the default grid), **Cursor** (Default / Crosshair / Busy / Help — applied via native Tailwind `cursor-*` utilities), **Wallpaper** (Bliss / Green Hills / Sunset Field / Night Sky / Classic Blue), **Assistant** (None + 10 agents), and **Properties**. Choices persist in `localStorage` (`xp-wallpaper`, `xp-cursor`, `xp-icon-pos`, `xp-assistant`, `xp-assistant-name`).
 
-Desktop icons are draggable; a dragged position overrides the default grid until "Arrange Icons" clears it.
+Desktop icons are draggable; a dragged position overrides the default grid until "Arrange Icons" clears it. On desktop an icon selects on single click and opens on double click; on phone-sized viewports a single tap opens it.
+
+**First visit:** a first-time visitor lands on **About Me** and **Contact Me** already open (About focused, upper-right; Contact lower-left). This is seeded once and gated by `localStorage['xp-visited']`, so returning visitors get a clean desktop (unless a deep link opens a specific window).
 
 ### Desktop assistant
 
-A Clippy-style companion (vendored from clippyjs — see `src/lib/`). It's **on by default** for first-time visitors: the agent loads during the boot screen (so the ~1 MB sprite download goes unnoticed) and greets once the desktop appears. It **reacts** to what you do — opens a window, drops a sticky note — by playing an animation and saying a line. Right-click → **Assistant** to switch between the 10 agents or turn it off; the choice persists (`xp-assistant`, `xp-assistant-name`). Only the selected agent's sprite is fetched (Vite code-splits each one). All logic lives in `use-assistant` (reactions in `assistant-reactions`); DOM/vendored contact is isolated in the `lib/clippy-agent` boundary.
+A Clippy-style companion (vendored from clippyjs — see `src/lib/`). It's **on by default** on desktop for first-time visitors: the agent loads during the boot screen (so the ~1 MB sprite download goes unnoticed) and greets once the desktop appears. It's **hidden on phone-sized viewports** (it would cover half the screen). It **reacts** to what you do — opens a window, drops a sticky note — by playing an animation and saying a line. Right-click → **Assistant** to switch between the 10 agents or turn it off; the choice persists (`xp-assistant`, `xp-assistant-name`). Only the selected agent's sprite is fetched (Vite code-splits each one). All logic lives in `use-assistant` (reactions in `assistant-reactions`); DOM/vendored contact is isolated in the `lib/clippy-agent` boundary.
 
 > **Note:** agents ship uncompressed sprites (`src/lib/clippy/agents/*/map.png`, ~0.7–1.9 MB each) and mp3 sounds — kept as-is from upstream, worth compressing before a production deploy.
 
@@ -199,7 +202,7 @@ A faithful Windows XP "Luna" theme. All colours are named tokens in `src/styles/
 
 - **Fonts:** `Tahoma, 'Trebuchet MS', sans-serif` (UI); `'Trebuchet MS', Tahoma` (display).
 - **Window model:** multiple windows open at once — each with its own position, minimize/maximize state and stacking order. Clicking a window (or its taskbar button) raises it; the top-most non-minimized window is "focused" and its id is mirrored in the URL. This is a deliberate deviation from the reference, which showed one window at a time.
-- **Stacking order:** a named z-index scale in `main.css` (`z-notes` → `z-window` → `z-taskbar` → `z-start-menu` → `z-balloon` → `z-context-menu` → `z-shutdown` → `z-boot`) — semantic classes instead of magic numbers. Windows share the `z-window` band and are ordered *within* it by a per-window `--stack` rank (`z-index: calc(100 + var(--stack))`) — a compact 1..n counter bounded by the number of open windows, so it always stays above notes and below the taskbar. Windows sit above notes deliberately (an open "page" should never hide under a note).
+- **Stacking order:** a named z-index scale in `main.css` (`z-notes` → `z-window` → `z-taskbar` → `z-start-menu` → `z-context-menu` → `z-shutdown` → `z-boot`) — semantic classes instead of magic numbers. Windows share the `z-window` band and are ordered *within* it by a per-window `--stack` rank (`z-index: calc(100 + var(--stack))`) — a compact 1..n counter bounded by the number of open windows, so it always stays above notes and below the taskbar. Windows sit above notes deliberately (an open "page" should never hide under a note).
 
 ### Accessibility
 

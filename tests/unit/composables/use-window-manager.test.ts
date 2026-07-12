@@ -155,6 +155,27 @@ describe('useWindowManager', () => {
     expect(wm.isMaximized('about')).toBe(false)
   })
 
+  it('opens a window at an explicit position, clamped to the viewport', () => {
+    const wm = useWindowManager()
+
+    wm.open('about', { x: 100, y: 50 })
+    expect(positionOf(wm, 'about')).toEqual({ x: 100, y: 50 })
+
+    wm.open('skills', { x: 999999, y: 999999 })
+    expect(positionOf(wm, 'skills')).toEqual({ x: 1200 - 60, y: 800 - 80 })
+  })
+
+  it('openDefaultLayout opens Contact then About, with About focused', () => {
+    const wm = useWindowManager()
+
+    wm.openDefaultLayout()
+
+    expect(wm.windows.value.map((win) => win.id)).toEqual(['contact', 'about'])
+    expect(wm.focusedId.value).toBe('about')
+    expect(positionOf(wm, 'contact')).toEqual({ x: Math.round(1200 * 0.06), y: Math.round(800 * 0.3) })
+    expect(positionOf(wm, 'about')).toEqual({ x: Math.round(1200 * 0.4), y: Math.round(800 * 0.12) })
+  })
+
   it('clamps a dragged window to the viewport', () => {
     const wm = useWindowManager()
     wm.open('about')

@@ -2,11 +2,28 @@
 import XpIcon from '@/components/ui/XpIcon.vue'
 import type { XpIconName } from '@/types/desktop'
 
-withDefaults(defineProps<{ label: string; icon: XpIconName; selected?: boolean }>(), {
-  selected: false,
-})
+const props = withDefaults(
+  defineProps<{ label: string; icon: XpIconName; selected?: boolean; singleClick?: boolean }>(),
+  { selected: false, singleClick: false },
+)
 
-defineEmits<{ select: []; open: [] }>()
+const emit = defineEmits<{ select: []; open: [] }>()
+
+// Desktop: single click selects, double click opens. Touch/phone (singleClick):
+// one tap opens straight away, since there's no hover/double-tap affordance.
+function onClick(): void {
+  if (props.singleClick) {
+    emit('open')
+  } else {
+    emit('select')
+  }
+}
+
+function onDblClick(): void {
+  if (!props.singleClick) {
+    emit('open')
+  }
+}
 </script>
 
 <template>
@@ -14,8 +31,8 @@ defineEmits<{ select: []; open: [] }>()
     type="button"
     class="flex w-20.5 flex-col items-center gap-1 rounded-xs border p-1 text-center"
     :class="selected ? 'border-dotted border-white/60 bg-icon-select/35' : 'border-transparent'"
-    @click="$emit('select')"
-    @dblclick="$emit('open')"
+    @click="onClick"
+    @dblclick="onDblClick"
     @keydown.enter.prevent="$emit('open')"
   >
     <XpIcon

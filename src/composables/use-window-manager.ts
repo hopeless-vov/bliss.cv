@@ -1,4 +1,5 @@
-import { MOBILE_BREAKPOINT, WINDOW_CASCADE_STEP } from '@/config/constants'
+import { useIsMobile } from '@/composables/use-is-mobile'
+import { DEFAULT_WINDOW_LAYOUT, WINDOW_CASCADE_STEP } from '@/config/constants'
 import type { WindowState } from '@/stores/windows'
 import { useWindowsStore } from '@/stores/windows'
 import type { Point } from '@/utils/clamp-window'
@@ -18,7 +19,7 @@ export function useWindowManager() {
   const store = useWindowsStore()
   const { width, height } = useWindowSize()
 
-  const isMobile = computed(() => width.value <= MOBILE_BREAKPOINT)
+  const isMobile = useIsMobile()
   const windows = computed(() => store.windows)
 
   // The focused window is the top-most (highest z) window that isn't minimized.
@@ -63,7 +64,7 @@ export function useWindowManager() {
     )
   }
 
-  function open(id: string): void {
+  function open(id: string, position?: Point): void {
     const existing = find(id)
     if (existing) {
       if (existing.minimized) {
@@ -72,7 +73,21 @@ export function useWindowManager() {
       store.focus(id)
       return
     }
-    store.add(id, spawnPosition())
+    const at = position
+      ? clampWindowPosition(position.x, position.y, width.value, height.value)
+      : spawnPosition()
+    store.add(id, at)
+  }
+
+  /*
+   * The layout a first-time visitor lands on: About and Contact open side by
+   * side (About focused, on top). Positions are viewport-relative so the two
+   * windows sit roughly where the design shows them on any screen size.
+   */
+  function openDefaultLayout(): void {
+    for (const { id, x, y } of DEFAULT_WINDOW_LAYOUT) {
+      open(id, { x: Math.round(width.value * x), y: Math.round(height.value * y) })
+    }
   }
 
   function close(id: string): void {
@@ -137,6 +152,7 @@ export function useWindowManager() {
     isVisible,
     isMaximized,
     open,
+    openDefaultLayout,
     close,
     closeFocused,
     focus,

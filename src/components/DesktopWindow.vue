@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import XpIcon from '@/components/ui/XpIcon.vue'
 import XpWindow from '@/components/ui/XpWindow.vue'
 import WindowContent from '@/components/WindowContent.vue'
 import { useContextMenu } from '@/composables/use-context-menu'
@@ -119,7 +120,11 @@ function styleFor(view: { win: WindowState; maximized: boolean }): Record<string
         @titlebar-dblclick="toggleMaximize(view.win.id)"
       >
         <template #icon>
-          <span class="block h-3.5 w-3.5 rounded-xs bg-white" />
+          <XpIcon
+            v-if="view.item"
+            :name="view.item.icon"
+            class="h-3.5 w-3.5"
+          />
         </template>
 
         <WindowContent

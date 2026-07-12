@@ -1,3 +1,4 @@
+import { useIsMobile } from '@/composables/use-is-mobile'
 import type { AssistantName } from '@/config/assistants'
 import { useAssistantStore } from '@/stores/assistant'
 import type { AssistantEvent } from '@/utils/assistant-reactions'
@@ -14,6 +15,7 @@ import { useI18n } from 'vue-i18n'
 export function useAssistant() {
   const store = useAssistantStore()
   const { t } = useI18n()
+  const isMobile = useIsMobile()
 
   const enabled = computed(() => store.enabled)
   const name = computed(() => store.name)
@@ -43,7 +45,8 @@ export function useAssistant() {
   }
 
   async function load(): Promise<void> {
-    if (!store.enabled) return
+    // The floating agent is desktop-only — it would cover half a phone screen.
+    if (!store.enabled || isMobile.value) return
 
     const requested = store.name
     const { loadAssistant } = await import('@/lib/clippy-agent')

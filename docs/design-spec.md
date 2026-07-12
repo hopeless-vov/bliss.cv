@@ -63,7 +63,6 @@ stop gradients are load-bearing for the Luna look — reproduce exactly.
 | Start menu right col | bg `#d3e5fa`, border `#99c8fc`, text `#1a3d7c` |
 | Content headings | `#003399`; body text `#3d3d3d`; meta `#6b6b6b`; links `#0044cc`/`#0058e6` |
 | Sticky note | bg `#fdf7b2`, border `#c9bd5a`, header `#f5e97a→#e8d95c`, text `#3d3410` |
-| Balloon tip | bg `#ffffe1`, 1px `#000`, radius 8px |
 | Boot accents | `#ff8c00` (XP), loader blocks `#7ba8f0→#2a52c8`, subtitle `#d8d8d8` |
 
 ## Layout
@@ -102,7 +101,9 @@ first window centres and each further one cascades `+18px` off the focused one
 (unless maximized). Clicking a window — or its taskbar button — raises it to the
 top; the top-most non-minimized window is "focused" (active title bar) and its
 id is mirrored in the URL. Minimizing drops a window from the DOM (the taskbar
-still lists it); restoring brings it back and forward. Chrome: outer `#ece9d8` +
+still lists it); restoring brings it back and forward. **First-time visitors**
+land on About + Contact already open (About upper-right and focused, Contact
+lower-left) — seeded once, gated by `xp-visited`. Chrome: outer `#ece9d8` +
 `1px #0831d9`, radius `8px 8px 0 0`,
 default `width:min(740px,94vw)`, `height:min(540px,100vh-90px)`, centered. Title
 bar (icon + `C:\Portfolio\<label>` + minimize/maximize/close 21×21) → menubar
@@ -114,16 +115,16 @@ education, contact, recycle (archived: Freelance, Logos mentoring).
 
 ## Boot / shutdown
 
-- **Boot** (`z-7000`, black): flag logo + "Volodymyr Bondarenko / Portfolio XP" + 220×18 loader (3 blue blocks, `xpload` 1.6s linear infinite). Auto-dismiss after **3.4s** or click to skip.
-- **Welcome balloon** after boot (bottom-right), auto-hides after **9s**.
+- **Boot** (`z-7000`, black): the "Bondarenko® / Volodymyr®cv" logotype (a play on the "Microsoft® / Windows®xp" lockup — `cv` in Luna orange) with a large XP flag to the right of the "Bondarenko®" line, bottom-aligned so it tucks close to "Volodymyr®cv" below + a 220×18 loader (3 blue blocks, `xpload` 1.6s linear infinite). Auto-dismiss after **3.4s** or click to skip. Straight to the desktop afterwards — no welcome balloon.
 - **Shutdown** (`z-5000`, black): orange "It is now safe to close this tab." Click → reboot (re-runs boot).
 
 ## Interactions
 
 Open several windows at once · click a window or its taskbar button to raise it
 · drag windows by title bar (clamped, disabled when maximized) ·
-minimize/maximize (title dbl-click toggles max) · close · icons: single-click select, click-selected
-or dbl-click opens, draggable with persisted positions · start menu toggles,
+minimize/maximize (title dbl-click toggles max) · close · icons: single-click select,
+click-selected or dbl-click opens (single tap opens on phone-sized viewports),
+draggable with persisted positions · start menu toggles,
 closes on desktop click · desktop right-click context menu (New Note, Arrange
 Icons, Cursor ▶, Wallpaper ▶, Properties) · cursor swap
 (`default/crosshair/wait/help`, applied via native Tailwind `cursor-*`
@@ -134,8 +135,8 @@ edit, delete (persisted to localStorage, no backend) · clock ticks every **15s*
 
 Lowest to highest: desktop icons (auto) → sticky notes (`z-60`) → windows
 (the `z-window` band: `z-index: calc(100 + var(--stack))`) → taskbar (`z-1000`)
-→ start menu (`z-1001`) → welcome balloon (`z-2000`) → context menu (`z-3000`) →
-shutdown screen (`z-5000`) → boot screen (`z-7000`). The base lives in the
+→ start menu (`z-1001`) → context menu (`z-3000`) → shutdown screen (`z-5000`) →
+boot screen (`z-7000`). The base lives in the
 `.z-window` token; each window sets only its `--stack` inline — a compact 1..n
 rank (re-normalised on add/focus/close), so it can never climb into the taskbar
 band. Windows keep a stable DOM order (insertion order) and stack purely by
@@ -146,7 +147,8 @@ see above.
 ## Config / persistence
 
 localStorage: `xp-icon-pos`, `xp-wallpaper`, `xp-cursor`, `xp-notes`,
-`xp-assistant`, `xp-assistant-name`.
+`xp-assistant`, `xp-assistant-name`, `xp-visited` (set after the first visit;
+gates the default About + Contact window layout).
 Assets: wallpapers are bundled local photos in `src/assets/`
 (Bliss is the default), icons are real `.svg` files under `src/assets/icons/`
 imported as components via `vite-svg-loader` (`?component`), cursors are native

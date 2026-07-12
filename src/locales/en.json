@@ -3,15 +3,12 @@
     "title": "Volodymyr Bondarenko — Portfolio"
   },
   "boot": {
-    "name": "Volodymyr Bondarenko",
-    "title": "Portfolio",
-    "xp": "XP",
+    "name": "Bondarenko",
+    "title": "Volodymyr",
+    "xp": "cv",
+    "reg": "®",
     "role": "Software Engineer · Amsterdam, NL",
     "skip": "click to skip"
-  },
-  "welcome": {
-    "title": "Welcome to Volodymyr's portfolio",
-    "body": "Double-click any icon to open it. Drag icons around. Right-click the desktop for settings."
   },
   "shutdown": {
     "safe": "It is now safe to close this tab.",

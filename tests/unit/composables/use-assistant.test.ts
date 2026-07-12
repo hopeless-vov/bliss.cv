@@ -26,11 +26,17 @@ function mountAssistant() {
   return withSetup(() => useAssistant())
 }
 
+function setWidth(w: number): void {
+  Object.defineProperty(window, 'innerWidth', { configurable: true, value: w })
+  window.dispatchEvent(new Event('resize'))
+}
+
 describe('useAssistant', () => {
   beforeEach(() => {
     window.localStorage.clear()
     setActivePinia(createPinia())
     vi.resetAllMocks()
+    setWidth(1200) // desktop by default; the assistant is desktop-only
   })
 
   it('exposes reactive enabled + name from the store', () => {
@@ -67,6 +73,16 @@ describe('useAssistant', () => {
 
     expect(load).not.toHaveBeenCalled()
     expect(store.handle).toBeNull()
+  })
+
+  it('load does nothing on a mobile viewport', async () => {
+    setWidth(375)
+    const assistant = mountAssistant()
+
+    await assistant.load()
+
+    expect(load).not.toHaveBeenCalled()
+    expect(useAssistantStore().handle).toBeNull()
   })
 
   it('load discards a stale agent when the name changed mid-load', async () => {

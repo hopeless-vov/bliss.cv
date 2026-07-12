@@ -18,5 +18,7 @@ export const DESKTOP_ITEMS: DesktopItem[] = [
   { id: 'contact', icon: 'mail', action: 'window', kind: 'contact', i18nBase: 'windows.contact', col: 1, row: 3 },
   { id: 'resume', icon: 'pdf', action: 'pdf', href: '/CV_Volodymyr.pdf', col: 2, row: 0 },
   { id: 'newNote', icon: 'note', action: 'note', col: 2, row: 1 },
+  { id: 'minesweeper', icon: 'minesweeper', action: 'window', kind: 'minesweeper', col: 2, row: 2 },
+  { id: 'explorer', icon: 'explorer', action: 'window', kind: 'browser', col: 2, row: 3 },
   { id: 'recycle', icon: 'bin', action: 'window', kind: 'recycle', i18nBase: 'windows.recycle' },
 ]

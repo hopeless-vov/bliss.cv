@@ -23,6 +23,8 @@ const OPEN_REACTIONS: Record<WindowKind, AssistantReaction> = {
   education: { animation: 'Congratulate', sayKey: 'assistant.say.education' },
   contact: { animation: 'GetAttention', sayKey: 'assistant.say.contact' },
   recycle: { animation: 'Alert', sayKey: 'assistant.say.recycle' },
+  minesweeper: { animation: 'Processing', sayKey: 'assistant.say.minesweeper' },
+  browser: { animation: 'Searching', sayKey: 'assistant.say.browser' },
 }
 
 export function reactionFor(event: AssistantEvent): AssistantReaction {

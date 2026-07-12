@@ -7,8 +7,18 @@ export type XpIconName =
   | 'pdf'
   | 'bin'
   | 'note'
+  | 'minesweeper'
+  | 'explorer'
 
-export type WindowKind = 'about' | 'experience' | 'skills' | 'education' | 'contact' | 'recycle'
+export type WindowKind =
+  | 'about'
+  | 'experience'
+  | 'skills'
+  | 'education'
+  | 'contact'
+  | 'recycle'
+  | 'minesweeper'
+  | 'browser'
 
 export type DesktopAction = 'window' | 'pdf' | 'note'
 

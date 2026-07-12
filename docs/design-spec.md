@@ -72,7 +72,7 @@ stop gradients are load-bearing for the Luna look — reproduce exactly.
 - **Taskbar** 32px tall, `z-1000`: Start pill (left) · open-window buttons (center) · clock tray (right).
 - **Start menu** 380px, `z-1001`, opens from `bottom:32px left:0`: header (VB avatar + name) → two columns (left = experience files, right = About/Skills/Education/Resume/Contact) → footer (Turn Off Computer).
 
-## Desktop icons (12)
+## Desktop icons (14)
 
 82px column, 40px glyph (`.svg` component), 11px white label. Positions persist in
 `localStorage['xp-icon-pos']`; grid origin `x=14+col*92, y=14+row*94`.
@@ -90,6 +90,8 @@ stop gradients are load-bearing for the Luna look — reproduce exactly.
 | contact | Contact_Me.eml | mail | window |
 | resume | CV_Volodymyr.pdf | pdf | open PDF in new tab |
 | newNote | Leave_a_Note.txt | sticky-note | spawn note |
+| minesweeper | Minesweeper.exe | minesweeper | window (playable 9×9 Minesweeper) |
+| explorer | Internet Explorer | explorer | window (offline browser + dino runner) |
 | recycle | Recycle Bin | bin | window (archived experience), bottom-right |
 
 ## Window model — **multiple windows**
@@ -112,6 +114,15 @@ Courier meta → `#003399` h1 → intro → sections (h2 + `<p>` + `<ul>`).
 
 Windows map to CV: about, vesper, worth, frozeneon, quinta, surelock, skills,
 education, contact, recycle (archived: Freelance, Logos mentoring).
+
+**App windows** (Minesweeper, Internet Explorer) reuse the same chrome but drop
+the File/Edit/View/Help menubar and the `C:\Portfolio\` title prefix, and size
+themselves: Minesweeper is a fixed 256×378, the browser is `min(740px,94vw)` ×
+`min(520px, …)`. Minesweeper is a real 9×9 / 10-mine game (LED mine counter +
+timer, reset face, first-click-safe); Internet Explorer is "offline" — full IE6
+chrome (menu bar, toolbar, address bar, status bar) whose *This page can't be
+displayed* error hosts the Chrome dino runner (Space / click to jump, best
+score persisted).
 
 ## Boot / shutdown
 
@@ -148,7 +159,8 @@ see above.
 
 localStorage: `xp-icon-pos`, `xp-wallpaper`, `xp-cursor`, `xp-notes`,
 `xp-assistant`, `xp-assistant-name`, `xp-visited` (set after the first visit;
-gates the default About + Contact window layout).
+gates the default About + Contact window layout), `xp-dino-best` (Internet
+Explorer runner high score).
 Assets: wallpapers are bundled local photos in `src/assets/`
 (Bliss is the default), icons are real `.svg` files under `src/assets/icons/`
 imported as components via `vite-svg-loader` (`?component`), cursors are native

@@ -62,6 +62,8 @@ describe('en.json content', () => {
       'education',
       'contact',
       'recycle',
+      'minesweeper',
+      'browser',
     ]
 
     for (const key of ['greet', 'note', ...openKinds]) {

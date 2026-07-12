@@ -52,6 +52,17 @@
   --color-luna-orange: #ff8c00;
   --color-icon-select: #0b3fbf; /* desktop icon selection */
 
+  /* Minesweeper (classic silver bevels + red LED) */
+  --color-mine-silver: #c0c0c0;
+  --color-mine-shadow: #7b7b7b;
+  --color-mine-led: #ff2b2b;
+  --color-mine-boom: #e03b26;
+
+  /* Internet Explorer chrome (beige toolbar borders + blue field outline) */
+  --color-ie-border: #cfc9b5;
+  --color-ie-border-strong: #a9a48f;
+  --color-ie-field-border: #7f9db9;
+
   /* Sticky notes */
   --color-note: #fdf7b2;
   --color-note-border: #c9bd5a;
@@ -225,6 +236,35 @@
 
   .xp-note-header {
     background-image: linear-gradient(to bottom, #f5e97a, #e8d95c);
+  }
+
+  /* Internet Explorer beige chrome gradients + the glossy blue "e" mark. */
+  .xp-ie-menu {
+    background-image: linear-gradient(to bottom, #f6f5ee, #e7e4d6);
+  }
+
+  .xp-ie-toolbar {
+    background-image: linear-gradient(to bottom, #f3f1e7 0%, #e2dece 100%);
+  }
+
+  .xp-ie-address {
+    background-image: linear-gradient(to bottom, #e2dece, #d8d3c0);
+  }
+
+  .xp-ie-status {
+    background-image: linear-gradient(to bottom, #f3f1e7, #e2dece);
+  }
+
+  .xp-ie-logo {
+    background-image: linear-gradient(135deg, #4aa3ff, #0a52c8);
+  }
+
+  .xp-ie-field {
+    box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.12);
+  }
+
+  .xp-ie-offline-dot {
+    background-image: radial-gradient(circle at 35% 30%, #ff8a5c, #c42713);
   }
 
   /* Wallpapers — bundled local assets (src/assets/*.webp), not remote URLs. */

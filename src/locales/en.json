@@ -33,6 +33,8 @@
     "file": "File",
     "edit": "Edit",
     "view": "View",
+    "favorites": "Favorites",
+    "tools": "Tools",
     "help": "Help"
   },
   "context": {
@@ -75,7 +77,9 @@
       "skills": "Quite the toolbox, isn't it?",
       "education": "Where it all started. Congrats, grad!",
       "contact": "Want to reach out? Here's how.",
-      "recycle": "Archived roles — nothing is ever really deleted."
+      "recycle": "Archived roles — nothing is ever really deleted.",
+      "minesweeper": "Careful in there — one wrong click and boom! 💣",
+      "browser": "No internet? Perfect excuse for a quick run. 🌵"
     }
   },
   "note": {
@@ -101,6 +105,8 @@
     "contact": "Contact_Me.eml",
     "resume": "CV_Volodymyr.pdf",
     "newNote": "Leave_a_Note.txt",
+    "minesweeper": "Minesweeper.exe",
+    "explorer": "Internet Explorer",
     "recycle": "Recycle Bin"
   },
   "windows": {
@@ -175,6 +181,27 @@
       "title": "Recycle Bin",
       "meta": "ADDITIONAL EXPERIENCE // ARCHIVED, NOT DELETED",
       "intro": "Older roles — archived, not deleted."
+    },
+    "minesweeper": {
+      "title": "Minesweeper",
+      "reset": "New game",
+      "hint": "Left-click reveals a tile · right-click plants a flag 🚩"
+    },
+    "browser": {
+      "title": "Internet Explorer",
+      "url": "http://portfolio.local/offline-runner.htm",
+      "address": "Address",
+      "back": "Back",
+      "home": "Home",
+      "go": "Go",
+      "reload": "Reload",
+      "offline": "Offline — content served from cache",
+      "zone": "Internet",
+      "cantTitle": "This page can't be displayed",
+      "cantBody": "You are not connected to the Internet. No connection, no problem — press Space or click below to run the dino past the cacti.",
+      "gameOver": "G A M E   O V E R",
+      "restart": "press space or click to run again",
+      "hint": "Press Space or click to jump"
     }
   },
   "experience": {

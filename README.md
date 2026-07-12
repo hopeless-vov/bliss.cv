@@ -106,7 +106,8 @@ src/
                    ShutdownScreen, StartButton, TaskbarButton, TaskbarClock, XpIcon…).
                    Props in, events out. No logic.
     (root)       → Smart components (Desktop, DesktopWindow, DesktopIcons, Taskbar, StartMenu,
-                   ContextMenu, StickyNotes, WindowContent) that wire ui/ to composables.
+                   ContextMenu, StickyNotes, WindowContent, Minesweeper, InternetExplorer) that
+                   wire ui/ to composables.
   composables/   → All logic, each with a unit test:
                    use-window-manager (multi-window: open/focus/close/min/max/stacking + mobile),
                    use-window-router (URL ↔ focused-window deep-link sync),
@@ -119,17 +120,22 @@ src/
                    use-assistant (desktop assistant: load/enable/disable/switch + reactions),
                    use-escape-key (a11y), use-dynamic-text (runtime i18n keys),
                    use-is-mobile (phone-sized viewport flag), use-first-run (first-visit gate),
+                   use-minesweeper (game state + clock), use-dino (offline runner lifecycle),
                    use-start-menu, use-start-menu-items, use-window-content, use-clock.
   stores/        → Thin Pinia state containers (windows, shell, notes, settings, assistant,
                    desktop, icon-positions, context-menu).
-  config/        → Structural data (desktop-items — the 12 icons + default grid; ext-badges;
+  config/        → Structural data (desktop-items — the 14 icons + default grid; ext-badges;
                    wallpapers; cursors; assistants — the 10 agents + default; constants).
   utils/         → Pure helpers (clamp-window, clamp-menu, icon-grid, format-clock,
-                   format-note-date, file-ext, generate-id, assistant-reactions), fully tested.
+                   format-note-date, file-ext, generate-id, assistant-reactions,
+                   minesweeper — the game rules, dino-physics — the runner's frame step),
+                   fully tested.
   lib/           → External boundaries / vendored code, used only via composables (never
                    imported directly by components/views). Excluded from lint + coverage.
                    clippy-agent.ts → our typed seam over the vendored runtime (loadAssistant →
                    AssistantHandle). Dynamically imported so clippy stays out of the initial bundle.
+                   dino-canvas.ts → the dino runner's <canvas> + rAF loop + input (drives the
+                   pure physics in utils/dino-physics), used only via use-dino.
                    lib/clippy/ → vendored clippyjs (MIT, pi0/clippyjs): the animated desktop
                    assistant runtime (agent/animator/balloon/queue) + 10 agents, each with a
                    real map.png sprite + mp3 sounds. Kept as-is (`@ts-nocheck` on the runtime);
@@ -153,8 +159,9 @@ tests/
   e2e/           → Playwright end-to-end tests: boot, window lifecycle (incl. Escape-to-close),
                    start menu/shutdown, context menu (cursor/wallpaper), deep links, multiple
                    windows (open side by side, raise from taskbar, minimize one of many), sticky notes,
-                   assistant (default-on first visit + turn off). The shared bootDesktop helper
-                   disables the assistant so a floating agent can't shadow click targets.
+                   Minesweeper + Internet Explorer (apps.spec), assistant (default-on first visit +
+                   turn off). The shared bootDesktop helper disables the assistant so a floating
+                   agent can't shadow click targets.
 
 docs/
   design-spec.md → The 1:1 visual spec (source of truth).
@@ -186,6 +193,13 @@ Every window has a shareable URL: `/vesper`, `/about`, `/skills`, … The URL mi
 ### Sticky notes
 
 `Leave_a_Note.txt` spawns a yellow sticky note: drag it by its header, edit the text, delete it. Notes are a local scratchpad — persisted to `localStorage['xp-notes']`, no backend.
+
+### Minesweeper & Internet Explorer
+
+Two working "apps" that open as their own (menubar-less) windows:
+
+- **`Minesweeper.exe`** — the classic 9×9 / 10-mine board with the LED counters, reset face, and first-click-is-always-safe rule. All rules are pure and tested in [`utils/minesweeper.ts`](src/utils/minesweeper.ts); the reactive board + clock live in `use-minesweeper`. Left-click reveals, right-click flags.
+- **`Internet Explorer`** — an "offline" browser whose *This page can't be displayed* screen hosts the Chrome dino runner. The frame-by-frame physics are pure and tested ([`utils/dino-physics.ts`](src/utils/dino-physics.ts)); the `<canvas>` + rAF loop + input live behind the `lib/dino-canvas` boundary, driven by `use-dino`, which persists the best score to `localStorage['xp-dino-best']`. Press **Space** or click to jump.
 
 ### Editing content
 

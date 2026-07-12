@@ -25,6 +25,8 @@ describe('reactionFor', () => {
       'education',
       'contact',
       'recycle',
+      'minesweeper',
+      'browser',
     ]
 
     for (const kind of kinds) {
